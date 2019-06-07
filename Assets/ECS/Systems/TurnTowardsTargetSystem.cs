@@ -29,45 +29,70 @@ public class TurnTowardsTargetSystem : JobComponentSystem
             ComponentType.ReadOnly(typeof(TargetSelection)),
             ComponentType.ReadOnly(typeof(TurnTowardsTarget)));
         var turnTowardTargetArray = eq.ToComponentDataArray<TargetSelection>(Allocator.TempJob);
-        var targetIsValid = new NativeArray<bool>(turnTowardTargetArray.Length, Allocator.TempJob);
+        var targetIsValidArray = new NativeArray<bool>(turnTowardTargetArray.Length, Allocator.TempJob);
         var targetTranslations = new NativeArray<Translation>(turnTowardTargetArray.Length, Allocator.TempJob);
         for (int i = 0; i < turnTowardTargetArray.Length; i++)
         {
             var target = turnTowardTargetArray[i].target;
-            targetIsValid[i] = World.Active.EntityManager.Exists(target) && World.Active.EntityManager.HasComponent<Translation>(target);
-            if(targetIsValid[i])
+            targetIsValidArray[i] = World.Active.EntityManager.Exists(target) && World.Active.EntityManager.HasComponent<Translation>(target);
+            if(targetIsValidArray[i])
                 targetTranslations[i] = World.Active.EntityManager.GetComponentData<Translation>(target);
         }
         turnTowardTargetArray.Dispose();
 
-        RotateJob j = new RotateJob
+        var ValidateTargets = new RemoveComponentJob
+        {
+            targetExists = targetIsValidArray,
+            commandBuffer = endSimulationEntityCommandBufferSystem.CreateCommandBuffer().ToConcurrent()
+        };
+        var returnDep = ValidateTargets.Schedule(this, inputDeps);
+
+        RotateJob RotateTowardsTargets = new RotateJob
         {
             dt = Time.deltaTime,
             targetTranslations = targetTranslations,
-            targetExists = targetIsValid,
-            commandBuffer = endSimulationEntityCommandBufferSystem.CreateCommandBuffer().ToConcurrent()
+            targetExists = targetIsValidArray
         };
-        inputDeps = j.Schedule(this, inputDeps);
+         returnDep = JobHandle.CombineDependencies(RotateTowardsTargets.Schedule(this, inputDeps), returnDep);
 
-        endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(inputDeps);
+        var deallocateJob = new DeallocateJob<bool>
+        {
+            toDeallocate = targetIsValidArray
+        };
+        returnDep = deallocateJob.Schedule(returnDep);
 
-        return inputDeps;
+        endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(returnDep);
+
+        return returnDep;
+    }
+
+    [RequireComponentTag(typeof(TurnTowardsTarget), typeof(TargetSelection), typeof(Rotation), typeof(RotationSpeed))]
+    struct RemoveComponentJob : IJobForEachWithEntity<Translation>
+    {
+        public EntityCommandBuffer.Concurrent commandBuffer;
+        [ReadOnly] public NativeArray<bool> targetExists;
+
+        public void Execute(Entity entity, int index, [ReadOnly] ref Translation trans)
+        {
+            if (!targetExists[index])
+            {
+                commandBuffer.RemoveComponent<TargetSelection>(index, entity);
+            }
+        }
     }
 
     [RequireComponentTag(typeof(TurnTowardsTarget), typeof(TargetSelection))]
-    //[BurstCompile]
+    [BurstCompile]
     struct RotateJob : IJobForEachWithEntity<Translation, Rotation, RotationSpeed>
     {
         public float dt;
-        public EntityCommandBuffer.Concurrent commandBuffer;
-        [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<bool> targetExists;
+        [ReadOnly] public NativeArray<bool> targetExists;
         [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<Translation> targetTranslations;
 
         public void Execute(Entity entity, int index, [ReadOnly] ref Translation translation, ref Rotation rotation, [ReadOnly] ref RotationSpeed rotationSpeed)
         {
             if (!targetExists[index])
             {
-                commandBuffer.RemoveComponent<TargetSelection>(index, entity);
                 return;
             }
 

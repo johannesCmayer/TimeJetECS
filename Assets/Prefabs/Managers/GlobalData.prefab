@@ -43,16 +43,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9282b58ce8e9a5478a5bae80c9efee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  friendlyPlaneMesh: {fileID: 4300000, guid: b10dbf1081a91c54d948bfca5f9038ce, type: 3}
+  friendlyPlaneMesh: {fileID: 5060444177187149915, guid: 57a0e165c2cfdb44ea0643a772626483,
+    type: 3}
   friendlyPlaneMaterial: {fileID: 2100000, guid: ee57c76924dd4c043ad41625fe018e5e,
     type: 2}
   EnemyPlaneMesh: {fileID: 4300000, guid: b10dbf1081a91c54d948bfca5f9038ce, type: 3}
   enemyPlaneMaterial: {fileID: 2100000, guid: 61332a8c2257f0944b3fc5b714f01c68, type: 2}
   missileMesh: {fileID: -3055721002252356758, guid: 32b9fc3db0d5ca64fb6a30acc1c626dd,
     type: 3}
-  missileMaterial: {fileID: 2100000, guid: a6a12a3946b6d424ab8de21f67f44cbc, type: 2}
+  missileMaterial: {fileID: 2100000, guid: 90891c5433f73374badb12b611f2bfff, type: 2}
   explosionMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   explosionMaterial: {fileID: 2100000, guid: cecf8e3eb839c0a42926dea5244e022b, type: 2}
-  missileTrailMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  missileTrailMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   missileTrailMaterial: {fileID: 2100000, guid: cecf8e3eb839c0a42926dea5244e022b,
     type: 2}
+  TrailRenderer: {fileID: 0}

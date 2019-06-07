@@ -10,7 +10,7 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
-[UpdateAfter(typeof(MovementSystem))]
+//[UpdateAfter(typeof(MovementSystem))]
 public class PlayerCamearSystem : ComponentSystem
 {
     protected override void OnUpdate()

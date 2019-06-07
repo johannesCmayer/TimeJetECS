@@ -16,7 +16,7 @@ public class UnitEnityDefinitions
     public static EntityArchetype friendlyPlaneArechetype;
     public static EntityArchetype enemyPlaneArechetype;
     public static EntityArchetype missileArechetype;
-    public static EntityArchetype meshChild;
+    //public static EntityArchetype meshChild;
     static bool isSetup;
     static EntityManager entityManager;
 
@@ -39,7 +39,8 @@ public class UnitEnityDefinitions
             typeof(Scale),
             typeof(LocalToWorld),
 
-            typeof(SphereCollider)
+            typeof(SphereCollider),
+            typeof(RenderMesh)
         );
 
         friendlyPlaneArechetype = entityManager.CreateArchetype(
@@ -52,7 +53,8 @@ public class UnitEnityDefinitions
             typeof(Scale),
             typeof(LocalToWorld),
 
-            typeof(SphereCollider)
+            typeof(SphereCollider),
+            typeof(RenderMesh)
         );
 
         enemyPlaneArechetype = entityManager.CreateArchetype(
@@ -65,7 +67,8 @@ public class UnitEnityDefinitions
             typeof(Scale),
             typeof(LocalToWorld),
 
-            typeof(SphereCollider)
+            typeof(SphereCollider),
+            typeof(RenderMesh)
         );
 
         missileArechetype = entityManager.CreateArchetype(
@@ -87,115 +90,57 @@ public class UnitEnityDefinitions
             typeof(SphereCollider)
         );
 
-        meshChild = entityManager.CreateArchetype(
-            typeof(RenderMesh),
+        //meshChild = entityManager.CreateArchetype(
+        //    typeof(RenderMesh),
 
-            typeof(LocalToWorld),
-            typeof(LocalToParent),
-            typeof(Parent),
+        //    typeof(LocalToWorld),
+        //    typeof(LocalToParent),
+        //    typeof(Parent),
 
-            typeof(Translation),
-            typeof(Rotation),
-            typeof(Scale)
-        );
+        //    typeof(Translation),
+        //    typeof(Rotation),
+        //    typeof(Scale)
+        //);
     }
 
     public static NativeArray<Entity> SetupPlanes(EntityArchetype a, int amount, Mesh mesh, Material material)
     {
         NativeArray<Entity> planes = new NativeArray<Entity>(amount, Allocator.Temp);
-        NativeArray<Entity> planeMeshChildren = new NativeArray<Entity>(amount, Allocator.Temp);
         entityManager.CreateEntity(a, planes);
-        entityManager.CreateEntity(meshChild, planeMeshChildren);
         for (int i = 0; i < amount; i++)
         {
             var plane = planes[i];
             var r = 20;
             var rpos = new float3(R.Range(-r, r), R.Range(-r, r), R.Range(-r, r));
-            entityManager.SetComponentData(plane, new Translation
-            {
-                Value = rpos
-            });
-            entityManager.SetComponentData(plane, new SphereCollider
-            {
-                size = 1f
-            });
-            entityManager.SetComponentData(plane, new MoveSpeed
-            {
-                Value = 1f
-            });
-            
-            var planeMeshChild = planeMeshChildren[i];
-            entityManager.SetComponentData(planeMeshChild, new Parent
-            {
-                Value = plane,               
-                
-            });
-            entityManager.SetSharedComponentData(planeMeshChild, new RenderMesh
+            entityManager.SetComponentData(plane, new Translation { Value = rpos });
+            entityManager.SetComponentData(plane, new Rotation { Value = quaternion.identity });
+            entityManager.SetComponentData(plane, new Scale { Value = 1f });
+            entityManager.SetComponentData(plane, new SphereCollider { size = 1f });
+            entityManager.SetComponentData(plane, new MoveSpeed { Value = 1f });
+            entityManager.SetSharedComponentData(plane, new RenderMesh
             {
                 mesh = mesh,
                 material = material
             });
-            entityManager.SetComponentData(planeMeshChild, new Rotation
-            {
-                Value = quaternion.Euler(-math.PI / 2, 0, 0)
-            });
-            entityManager.SetComponentData(planeMeshChild, new Scale
-            {
-                Value = 1f
-            });
-
-            entityManager.SetComponentData(plane, new Rotation
-            {
-                Value = quaternion.Euler(0, math.PI / 2, 0)
-            });
-            entityManager.SetComponentData(plane, new Scale
-            {
-                Value = 1f
-            });
         }
-        planeMeshChildren.Dispose();
         return planes;
     }
 
     public static void SetupMissile(float3 pos, quaternion rotation, Entity target)
     {
         var missile = entityManager.CreateEntity(UnitEnityDefinitions.missileArechetype);
-        entityManager.SetComponentData(missile, new Translation
-        {
-            Value = pos
-        });
-        entityManager.SetComponentData(missile, new Rotation
-        {
-            Value = rotation
-        });
-        entityManager.SetComponentData(missile, new SphereCollider
-        {
-            size = 1f
-        });
-        entityManager.SetComponentData(missile, new MoveSpeed
-        {
-            Value = 10
-        });
-        entityManager.SetComponentData(missile, new Scale
-        {
-            Value = 1f
-        });
+        entityManager.SetComponentData(missile, new Translation { Value = pos });
+        entityManager.SetComponentData(missile, new Rotation { Value = rotation });
+        entityManager.SetComponentData(missile, new SphereCollider { size = 1f });
+        entityManager.SetComponentData(missile, new MoveSpeed { Value = 10 });
+        entityManager.SetComponentData(missile, new Scale { Value = 1f });
         entityManager.SetSharedComponentData(missile, new RenderMesh
         {
             mesh = GlobalData.instance.missileMesh,
             material = GlobalData.instance.missileMaterial
         });
-        entityManager.SetComponentData(missile, new Scale
-        {
-            Value = 0.3f
-        });
-        entityManager.SetComponentData(missile, new TargetSelection
-        {
-            target = target
-        });
-        entityManager.SetComponentData(missile, new RotationSpeed
-        {
-            Value = 1
-        });
+        entityManager.SetComponentData(missile, new Scale { Value = 0.3f });
+        entityManager.SetComponentData(missile, new TargetSelection { target = target });
+        entityManager.SetComponentData(missile, new RotationSpeed { Value = 1 });
     }
 }

@@ -10,6 +10,7 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
+[DisableAutoCreation]
 public class TrailSystem : JobComponentSystem
 {
     EndSimulationEntityCommandBufferSystem endSimulationEntityCommandBufferSystem;
