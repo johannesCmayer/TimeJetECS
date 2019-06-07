@@ -12,27 +12,22 @@ using Unity.Burst;
 
 public class Boot : MonoBehaviour
 {
-    public Mesh playerPlaneMesh;
-    public Mesh EnemyPlaneMesh;
-    public Mesh missileMesh;
-    public Material playerPlaneMaterial;
-    public Material enemyPlaneMaterial;
-    public Material missileMaterial;
-
     EntityManager entityManager;
 
     void Start()
     {
         entityManager = World.Active.EntityManager;
+        print($"eman {entityManager}");
+        var gd = GlobalData.instance;
+        print($"global data {gd}");
 
-        UnitEnityDefinitions.Setup();
-
-        var player = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.playerPlaneArechetype, 1, playerPlaneMesh, playerPlaneMaterial)[0];
-        var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 200, EnemyPlaneMesh, enemyPlaneMaterial);
+        var player = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.playerPlaneArechetype, 1, gd.friendlyPlaneMesh, gd.friendlyPlaneMaterial)[0];
+        var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 100, gd.EnemyPlaneMesh, gd.enemyPlaneMaterial);
 
         for (int i = 0; i < enemyPlanes.Length; i++)
         {
-            UnitEnityDefinitions.SetupMissile(new float3(R.Range(-10, 10), R.Range(-10, 10), R.Range(-10, 10)) + new float3(0, 0, 100), math.normalize(new quaternion(0.5f,0,0.0f,0)), enemyPlanes[i], missileMesh, missileMaterial);
+            var spawnPos = new float3(R.Range(-100, 100), R.Range(-100, 100), R.Range(-100, 100)) + new float3(0, 0, 100);
+            UnitEnityDefinitions.SetupMissile(spawnPos, quaternion.identity, enemyPlanes[i]);
         }
     }
 }

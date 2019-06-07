@@ -44,7 +44,7 @@ public class DestroyCollidingSystem : JobComponentSystem
         return inputDeps;
     }
 
-    [BurstCompile]
+    //[BurstCompile]
     struct DestroyJob : IJobForEachWithEntity<SphereCollider, Translation>
     {
         public EntityCommandBuffer.Concurrent commandBuffer;
@@ -53,17 +53,18 @@ public class DestroyCollidingSystem : JobComponentSystem
         [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<SphereCollider> entityColliders;
         
 
-        public void Execute(Entity entity, int index, [ReadOnly] ref SphereCollider collider, [ReadOnly] ref Translation tarnslation)
+        public void Execute(Entity entity, int index, [ReadOnly] ref SphereCollider collider, [ReadOnly] ref Translation translation)
         {
             for (int i = 0; i < entityColliderTranslations.Length; i++)
             {
                 if (entity == entitiesWithColliders[i])
                     continue;
 
-                if (math.distance(tarnslation.Value, entityColliderTranslations[i].Value) < collider.size + entityColliders[i].size)
+                if (math.distance(translation.Value, entityColliderTranslations[i].Value) < collider.size + entityColliders[i].size)
                 {
                     commandBuffer.DestroyEntity(index, entity);
                     commandBuffer.DestroyEntity(index, entitiesWithColliders[i]);
+                    EffectsEntityDefinition.SetupExplosion(commandBuffer, index, translation.Value);
                 }
             }
         }

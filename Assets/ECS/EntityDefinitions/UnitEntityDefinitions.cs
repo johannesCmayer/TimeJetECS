@@ -22,6 +22,7 @@ public class UnitEnityDefinitions
 
     public static void Setup()
     {
+        Debug.Log($"setup {typeof(UnitEnityDefinitions)}");
         if (isSetup)
             return;
         isSetup = true;
@@ -69,6 +70,8 @@ public class UnitEnityDefinitions
 
         missileArechetype = entityManager.CreateArchetype(
             typeof(MissileTag),
+            typeof(HasTrailTag),
+
             typeof(MoveSpeed),
             typeof(RotationSpeed),
             typeof(TargetSelection),
@@ -102,11 +105,11 @@ public class UnitEnityDefinitions
         NativeArray<Entity> planes = new NativeArray<Entity>(amount, Allocator.Temp);
         NativeArray<Entity> planeMeshChildren = new NativeArray<Entity>(amount, Allocator.Temp);
         entityManager.CreateEntity(a, planes);
-        entityManager.CreateEntity(UnitEnityDefinitions.meshChild, planeMeshChildren);
+        entityManager.CreateEntity(meshChild, planeMeshChildren);
         for (int i = 0; i < amount; i++)
         {
             var plane = planes[i];
-            var r = 50;
+            var r = 20;
             var rpos = new float3(R.Range(-r, r), R.Range(-r, r), R.Range(-r, r));
             entityManager.SetComponentData(plane, new Translation
             {
@@ -154,7 +157,7 @@ public class UnitEnityDefinitions
         return planes;
     }
 
-    public static void SetupMissile(float3 pos, quaternion rotation, Entity target, Mesh missileMesh, Material missileMaterial)
+    public static void SetupMissile(float3 pos, quaternion rotation, Entity target)
     {
         var missile = entityManager.CreateEntity(UnitEnityDefinitions.missileArechetype);
         entityManager.SetComponentData(missile, new Translation
@@ -179,8 +182,8 @@ public class UnitEnityDefinitions
         });
         entityManager.SetSharedComponentData(missile, new RenderMesh
         {
-            mesh = missileMesh,
-            material = missileMaterial
+            mesh = GlobalData.instance.missileMesh,
+            material = GlobalData.instance.missileMaterial
         });
         entityManager.SetComponentData(missile, new Scale
         {

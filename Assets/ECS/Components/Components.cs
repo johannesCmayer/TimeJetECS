@@ -14,6 +14,8 @@ public struct PlayerTag : IComponentData { }
 public struct FriendlyAITag : IComponentData { }
 public struct EnemyAITag : IComponentData { }
 public struct MissileTag : IComponentData { }
+public struct HasTrailTag : IComponentData { }
+public struct ExplosionTag : IComponentData { }
 
 public struct TurnTowardsTarget : IComponentData { }
 
@@ -49,12 +51,7 @@ public struct SphereCollider : IComponentData
     public float size;
 }
 
-public struct SelfDestruct
+public struct DestroyAfterTime : IComponentData
 {
     public float timeToDestruction;
-}
-
-public struct DestructionEffect
-{
-    public EntityArchetype destructionEffect;
 }

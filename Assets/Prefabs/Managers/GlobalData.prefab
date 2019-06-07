@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2323014358741440984
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2323014358741440990}
+  - component: {fileID: 2323014358741440985}
+  m_Layer: 0
+  m_Name: GlobalData
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2323014358741440990
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2323014358741440984}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2323014358741440985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2323014358741440984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9282b58ce8e9a5478a5bae80c9efee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  friendlyPlaneMesh: {fileID: 4300000, guid: b10dbf1081a91c54d948bfca5f9038ce, type: 3}
+  friendlyPlaneMaterial: {fileID: 2100000, guid: ee57c76924dd4c043ad41625fe018e5e,
+    type: 2}
+  EnemyPlaneMesh: {fileID: 4300000, guid: b10dbf1081a91c54d948bfca5f9038ce, type: 3}
+  enemyPlaneMaterial: {fileID: 2100000, guid: 61332a8c2257f0944b3fc5b714f01c68, type: 2}
+  missileMesh: {fileID: -3055721002252356758, guid: 32b9fc3db0d5ca64fb6a30acc1c626dd,
+    type: 3}
+  missileMaterial: {fileID: 2100000, guid: a6a12a3946b6d424ab8de21f67f44cbc, type: 2}
+  explosionMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  explosionMaterial: {fileID: 2100000, guid: cecf8e3eb839c0a42926dea5244e022b, type: 2}
+  missileTrailMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  missileTrailMaterial: {fileID: 2100000, guid: cecf8e3eb839c0a42926dea5244e022b,
+    type: 2}
