@@ -10,15 +10,12 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
-public class Test : MonoBehaviour
+public class DebugDrawSphereColliders : ComponentSystem
 {
-    void Start()
+    protected override void OnUpdate()
     {
-        
-    }
-
-    void Update()
-    {
-        
+        Entities.ForEach((ref Translation t, ref SphereCollider c) => {
+            
+        });
     }
 }

@@ -10,15 +10,12 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
-// Object type tags
 public struct PlayerTag : IComponentData { }
 public struct FriendlyAITag : IComponentData { }
 public struct EnemyAITag : IComponentData { }
 public struct MissileTag : IComponentData { }
 
-// Behaviour type tags
 public struct TurnTowardsTarget : IComponentData { }
-
 
 public struct TargetSelection : IComponentData
 {

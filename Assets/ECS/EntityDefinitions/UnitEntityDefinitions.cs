@@ -10,12 +10,12 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
-public class Archetypes
+public class UnitEnityDefinitions
 {
     public static EntityArchetype playerPlaneArechetype;
     public static EntityArchetype friendlyPlaneArechetype;
     public static EntityArchetype enemyPlaneArechetype;
-    public static EntityArchetype missileArchetype;
+    public static EntityArchetype missileArechetype;
     public static EntityArchetype meshChild;
     static bool isSetup;
     static EntityManager entityManager;
@@ -45,7 +45,6 @@ public class Archetypes
             typeof(FriendlyAITag),
             typeof(MoveSpeed),
             typeof(SteerInput),
-            typeof(TurnTowardsTarget),
 
             typeof(Translation),
             typeof(Rotation),
@@ -59,7 +58,6 @@ public class Archetypes
             typeof(EnemyAITag),
             typeof(MoveSpeed),
             typeof(SteerInput),
-            typeof(TurnTowardsTarget),
 
             typeof(Translation),
             typeof(Rotation),
@@ -69,7 +67,7 @@ public class Archetypes
             typeof(SphereCollider)
         );
 
-        missileArchetype = entityManager.CreateArchetype(
+        missileArechetype = entityManager.CreateArchetype(
             typeof(MissileTag),
             typeof(MoveSpeed),
             typeof(RotationSpeed),
@@ -104,7 +102,7 @@ public class Archetypes
         NativeArray<Entity> planes = new NativeArray<Entity>(amount, Allocator.Temp);
         NativeArray<Entity> planeMeshChildren = new NativeArray<Entity>(amount, Allocator.Temp);
         entityManager.CreateEntity(a, planes);
-        entityManager.CreateEntity(Archetypes.meshChild, planeMeshChildren);
+        entityManager.CreateEntity(UnitEnityDefinitions.meshChild, planeMeshChildren);
         for (int i = 0; i < amount; i++)
         {
             var plane = planes[i];
@@ -158,7 +156,7 @@ public class Archetypes
 
     public static void SetupMissile(float3 pos, quaternion rotation, Entity target, Mesh missileMesh, Material missileMaterial)
     {
-        var missile = entityManager.CreateEntity(Archetypes.missileArchetype);
+        var missile = entityManager.CreateEntity(UnitEnityDefinitions.missileArechetype);
         entityManager.SetComponentData(missile, new Translation
         {
             Value = pos
@@ -169,11 +167,11 @@ public class Archetypes
         });
         entityManager.SetComponentData(missile, new SphereCollider
         {
-            size = 0.2f
+            size = 1f
         });
         entityManager.SetComponentData(missile, new MoveSpeed
         {
-            Value = 1
+            Value = 10
         });
         entityManager.SetComponentData(missile, new Scale
         {

@@ -25,14 +25,14 @@ public class Boot : MonoBehaviour
     {
         entityManager = World.Active.EntityManager;
 
-        Archetypes.Setup();
+        UnitEnityDefinitions.Setup();
 
-        var player = Archetypes.SetupPlanes(Archetypes.playerPlaneArechetype, 1, playerPlaneMesh, playerPlaneMaterial)[0];
-        Archetypes.SetupPlanes(Archetypes.enemyPlaneArechetype, 200, EnemyPlaneMesh, enemyPlaneMaterial).Dispose();
+        var player = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.playerPlaneArechetype, 1, playerPlaneMesh, playerPlaneMaterial)[0];
+        var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 200, EnemyPlaneMesh, enemyPlaneMaterial);
 
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < enemyPlanes.Length; i++)
         {
-            Archetypes.SetupMissile(new float3(R.Range(-10, 10), R.Range(-10, 10), R.Range(-10, 10)), math.normalize(new quaternion(0.5f,0,0.0f,0)), player, missileMesh, missileMaterial);
+            UnitEnityDefinitions.SetupMissile(new float3(R.Range(-10, 10), R.Range(-10, 10), R.Range(-10, 10)) + new float3(0, 0, 100), math.normalize(new quaternion(0.5f,0,0.0f,0)), enemyPlanes[i], missileMesh, missileMaterial);
         }
     }
 }
