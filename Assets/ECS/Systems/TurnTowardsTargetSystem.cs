@@ -13,24 +13,26 @@ using Unity.Burst;
 public class TurnTowardsTargetSystem : JobComponentSystem
 {
     EndSimulationEntityCommandBufferSystem endSimulationEntityCommandBufferSystem;
+    EntityQuery entityQuery;
 
     protected override void OnCreate()
     {
         endSimulationEntityCommandBufferSystem = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-        base.OnCreate();
-    }
-
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
-    {
-        var eq = GetEntityQuery(
+        entityQuery = GetEntityQuery(
             ComponentType.ReadOnly(typeof(Translation)),
             ComponentType.ReadOnly(typeof(Rotation)),
             ComponentType.ReadOnly(typeof(RotationSpeed)),
             ComponentType.ReadOnly(typeof(TargetSelection)),
             ComponentType.ReadOnly(typeof(TurnTowardsTarget)));
-        var turnTowardTargetArray = eq.ToComponentDataArray<TargetSelection>(Allocator.TempJob);
+        base.OnCreate();
+    }
+
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    {
+        var turnTowardTargetArray = entityQuery.ToComponentDataArray<TargetSelection>(Allocator.TempJob);
         var targetIsValidArray = new NativeArray<bool>(turnTowardTargetArray.Length, Allocator.TempJob);
         var targetTranslations = new NativeArray<Translation>(turnTowardTargetArray.Length, Allocator.TempJob);
+
         for (int i = 0; i < turnTowardTargetArray.Length; i++)
         {
             var target = turnTowardTargetArray[i].target;
@@ -38,32 +40,37 @@ public class TurnTowardsTargetSystem : JobComponentSystem
             if(targetIsValidArray[i])
                 targetTranslations[i] = World.Active.EntityManager.GetComponentData<Translation>(target);
         }
+
         turnTowardTargetArray.Dispose();
 
-        var ValidateTargets = new RemoveComponentJob
+        JobHandle validateTargets = new RemoveComponentJob
         {
             targetExists = targetIsValidArray,
             commandBuffer = endSimulationEntityCommandBufferSystem.CreateCommandBuffer().ToConcurrent()
-        };
-        var returnDep = ValidateTargets.Schedule(this, inputDeps);
+        }.Schedule(this, inputDeps);
 
-        RotateJob RotateTowardsTargets = new RotateJob
+        endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(validateTargets);
+
+        JobHandle rotateTowardsTargets = new RotateJob
         {
             dt = Time.deltaTime,
             targetTranslations = targetTranslations,
             targetExists = targetIsValidArray
-        };
-         returnDep = JobHandle.CombineDependencies(RotateTowardsTargets.Schedule(this, inputDeps), returnDep);
+        }.Schedule(this, inputDeps);
 
-        var deallocateJob = new DeallocateJob<bool>
+        JobHandle deallocDep = JobHandle.CombineDependencies(validateTargets, rotateTowardsTargets);
+
+        JobHandle deallocateJob = new DeallocateJob<bool>
         {
             toDeallocate = targetIsValidArray
-        };
-        returnDep = deallocateJob.Schedule(returnDep);
+        }.Schedule(deallocDep);
 
-        endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(returnDep);
+        return deallocateJob;
+    }
 
-        return returnDep;
+    protected override void OnDestroyManager()
+    {
+        base.OnDestroyManager();
     }
 
     [RequireComponentTag(typeof(TurnTowardsTarget), typeof(TargetSelection), typeof(Rotation), typeof(RotationSpeed))]

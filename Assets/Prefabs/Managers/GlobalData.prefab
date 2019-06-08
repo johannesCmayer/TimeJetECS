@@ -57,4 +57,5 @@ MonoBehaviour:
   missileTrailMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   missileTrailMaterial: {fileID: 2100000, guid: cecf8e3eb839c0a42926dea5244e022b,
     type: 2}
-  TrailRenderer: {fileID: 0}
+  TrailRenderer: {fileID: 6413203767959416617, guid: 9a18dda371abbcc45a703b1b78e33695,
+    type: 3}

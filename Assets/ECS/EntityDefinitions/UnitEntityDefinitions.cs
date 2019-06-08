@@ -31,8 +31,10 @@ public class UnitEnityDefinitions
 
         playerPlaneArechetype = entityManager.CreateArchetype(
             typeof(PlayerTag),
+
             typeof(MoveSpeed),
-            typeof(SteerInput),
+            typeof(Velocity),
+            typeof(SteeringInput),
 
             typeof(Translation),
             typeof(Rotation),
@@ -45,8 +47,11 @@ public class UnitEnityDefinitions
 
         friendlyPlaneArechetype = entityManager.CreateArchetype(
             typeof(FriendlyAITag),
+
             typeof(MoveSpeed),
-            typeof(SteerInput),
+            typeof(Velocity),
+            typeof(TargetSelection),
+            typeof(TurnTowardsTarget),
 
             typeof(Translation),
             typeof(Rotation),
@@ -59,8 +64,11 @@ public class UnitEnityDefinitions
 
         enemyPlaneArechetype = entityManager.CreateArchetype(
             typeof(EnemyAITag),
+
             typeof(MoveSpeed),
-            typeof(SteerInput),
+            typeof(Velocity),
+            typeof(TargetSelection),
+            typeof(TurnTowardsTarget),
 
             typeof(Translation),
             typeof(Rotation),
@@ -73,9 +81,10 @@ public class UnitEnityDefinitions
 
         missileArechetype = entityManager.CreateArchetype(
             typeof(MissileTag),
-            typeof(HasTrailTag),
+            typeof(HasTrailTag),           
 
             typeof(MoveSpeed),
+            typeof(Velocity),
             typeof(RotationSpeed),
             typeof(TargetSelection),
             typeof(TurnTowardsTarget),
@@ -116,7 +125,8 @@ public class UnitEnityDefinitions
             entityManager.SetComponentData(plane, new Rotation { Value = quaternion.identity });
             entityManager.SetComponentData(plane, new Scale { Value = 1f });
             entityManager.SetComponentData(plane, new SphereCollider { size = 1f });
-            entityManager.SetComponentData(plane, new MoveSpeed { Value = 1f });
+            entityManager.SetComponentData(plane, new MoveSpeed { Value = new float3(0, 0, 0f) });
+            entityManager.SetComponentData(plane, new Velocity { Value = new float3(0, 0, 1f) });
             entityManager.SetSharedComponentData(plane, new RenderMesh
             {
                 mesh = mesh,
@@ -126,13 +136,15 @@ public class UnitEnityDefinitions
         return planes;
     }
 
-    public static void SetupMissile(float3 pos, quaternion rotation, Entity target)
+    public static void SetupMissile(float3 pos, quaternion rotation, Velocity v, Entity target)
     {
         var missile = entityManager.CreateEntity(UnitEnityDefinitions.missileArechetype);
         entityManager.SetComponentData(missile, new Translation { Value = pos });
         entityManager.SetComponentData(missile, new Rotation { Value = rotation });
         entityManager.SetComponentData(missile, new SphereCollider { size = 1f });
-        entityManager.SetComponentData(missile, new MoveSpeed { Value = 10 });
+        entityManager.SetComponentData(missile, new MoveSpeed { Value = new float3(0, 0, 1f) });
+        entityManager.SetComponentData(missile, new Velocity { Value = v.Value });
+        entityManager.SetComponentData(missile, new RotationSpeed { Value = 4 });
         entityManager.SetComponentData(missile, new Scale { Value = 1f });
         entityManager.SetSharedComponentData(missile, new RenderMesh
         {
@@ -140,7 +152,6 @@ public class UnitEnityDefinitions
             material = GlobalData.instance.missileMaterial
         });
         entityManager.SetComponentData(missile, new Scale { Value = 0.3f });
-        entityManager.SetComponentData(missile, new TargetSelection { target = target });
-        entityManager.SetComponentData(missile, new RotationSpeed { Value = 1 });
+        entityManager.SetComponentData(missile, new TargetSelection { target = target });        
     }
 }

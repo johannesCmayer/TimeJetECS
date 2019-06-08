@@ -17,6 +17,15 @@ public struct MissileTag : IComponentData { }
 public struct HasTrailTag : IComponentData { }
 public struct ExplosionTag : IComponentData { }
 
+public struct TrailSystemState : ISystemStateComponentData {
+    public int trailIdx;
+}
+
+public struct Velocity : IComponentData
+{
+    public float3 Value;
+}
+
 public struct TurnTowardsTarget : IComponentData { }
 
 public struct TargetSelection : IComponentData
@@ -26,7 +35,7 @@ public struct TargetSelection : IComponentData
 
 public struct MoveSpeed : IComponentData
 {
-    public float Value;
+    public float3 Value;
 }
 
 public struct RotationSpeed : IComponentData
@@ -34,11 +43,11 @@ public struct RotationSpeed : IComponentData
     public float Value;
 }
 
-public struct SteerInput : IComponentData
+public struct SteeringInput : IComponentData
 {
     public float pitch;
-    public float tilt;
     public float yaw;
+    public float roll;
 }
 
 public struct FireWeapon : IComponentData

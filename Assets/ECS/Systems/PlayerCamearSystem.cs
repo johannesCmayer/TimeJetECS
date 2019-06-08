@@ -15,11 +15,12 @@ public class PlayerCamearSystem : ComponentSystem
 {
     protected override void OnUpdate()
     {
-        Entities.WithAll<PlayerTag>().ForEach((ref Translation translation, ref Rotation rotation) => {            
+        Entities.WithAll<PlayerTag>().ForEach((ref Translation translation, ref Rotation rotation) => {
             var forward = rotation.Value.forward();
             var up = rotation.Value.up();
             var left = rotation.Value.left();
-            var camOffset = up + forward * -3 + left;
+            // var camOffset = up + forward * -3 + left;
+            var camOffset = float3.zero;
 
             var camTrans = Camera.main.transform;
             camTrans.position = translation.Value +  camOffset;

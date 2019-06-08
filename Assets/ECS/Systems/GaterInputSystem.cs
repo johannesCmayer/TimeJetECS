@@ -10,15 +10,19 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
-public class GaterInputSystem : MonoBehaviour
+public class GaterInputSystem : ComponentSystem
 {
-    void Start()
-    {
-        
-    }
+    float speed = 20;
 
-    void Update()
+    protected override void OnUpdate()
     {
-        
+        Entities.WithAll<PlayerTag>().ForEach((ref SteeringInput steerInput) => {
+            steerInput = new SteeringInput
+            {   
+                pitch = Input.GetAxis("Vertical") * speed,
+                roll = Input.GetAxis("Horizontal") * speed,
+                yaw = 0
+            };
+        });
     }
 }

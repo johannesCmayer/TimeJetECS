@@ -26,21 +26,8 @@ public class Boot : MonoBehaviour
 
         for (int i = 0; i < enemyPlanes.Length; i++)
         {
-            var spawnPos = new float3(R.Range(-100, 100), R.Range(-100, 100), R.Range(-100, 100)) + new float3(0, 0, 100);
-            UnitEnityDefinitions.SetupMissile(spawnPos, quaternion.identity, enemyPlanes[i]);
+            var spawnPos = new float3(R.Range(-100, 100), R.Range(-100, 100), R.Range(-100, 100)) + new float3(0, 0, 300);
+            UnitEnityDefinitions.SetupMissile(spawnPos, quaternion.identity, new Velocity { Value = float3.zero }, enemyPlanes[i]);
         }
-    }
-}
-
-public class DebugMovePlayer : ComponentSystem
-{
-    protected override void OnUpdate()
-    {
-        var s = math.sin(Time.realtimeSinceStartup);
-        var c = math.cos(Time.realtimeSinceStartup);
-        Entities.WithAll<PlayerTag>().ForEach((ref Rotation rotation) =>
-        {            
-            rotation.Value = math.normalize(new quaternion(s, c, 0.0f, 1));
-        });
     }
 }
