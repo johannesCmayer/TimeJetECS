@@ -26,6 +26,11 @@ public struct Velocity : IComponentData
     public float3 Value;
 }
 
+public struct AngularVelocity : IComponentData
+{
+    public float3 Value;
+}
+
 public struct TurnTowardsTarget : IComponentData { }
 
 public struct TargetSelection : IComponentData

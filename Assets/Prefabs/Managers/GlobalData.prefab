@@ -47,7 +47,8 @@ MonoBehaviour:
     type: 3}
   friendlyPlaneMaterial: {fileID: 2100000, guid: ee57c76924dd4c043ad41625fe018e5e,
     type: 2}
-  EnemyPlaneMesh: {fileID: 4300000, guid: b10dbf1081a91c54d948bfca5f9038ce, type: 3}
+  EnemyPlaneMesh: {fileID: 5060444177187149915, guid: 57a0e165c2cfdb44ea0643a772626483,
+    type: 3}
   enemyPlaneMaterial: {fileID: 2100000, guid: 61332a8c2257f0944b3fc5b714f01c68, type: 2}
   missileMesh: {fileID: -3055721002252356758, guid: 32b9fc3db0d5ca64fb6a30acc1c626dd,
     type: 3}

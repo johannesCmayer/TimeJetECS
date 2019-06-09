@@ -22,12 +22,12 @@ public class Boot : MonoBehaviour
         print($"global data {gd}");
 
         var player = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.playerPlaneArechetype, 1, gd.friendlyPlaneMesh, gd.friendlyPlaneMaterial)[0];
-        var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 100, gd.EnemyPlaneMesh, gd.enemyPlaneMaterial);
+        //var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 100, gd.EnemyPlaneMesh, gd.enemyPlaneMaterial);
 
-        for (int i = 0; i < enemyPlanes.Length; i++)
-        {
-            var spawnPos = new float3(R.Range(-100, 100), R.Range(-100, 100), R.Range(-100, 100)) + new float3(0, 0, 300);
-            UnitEnityDefinitions.SetupMissile(spawnPos, quaternion.identity, new Velocity { Value = float3.zero }, enemyPlanes[i]);
-        }
+        //for (int i = 0; i < enemyPlanes.Length; i++)
+        //{
+        //    var spawnPos = new float3(R.Range(-100, 100), R.Range(-100, 100), R.Range(-100, 100)) + new float3(0, 0, 300);
+        //    UnitEnityDefinitions.SetupMissile(spawnPos, quaternion.identity, new Velocity { Value = float3.zero }, enemyPlanes[i]);
+        //}
     }
 }

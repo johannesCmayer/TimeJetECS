@@ -14,16 +14,25 @@ public class SteeringSystem : ComponentSystem
 {
     protected override void OnUpdate()
     {
-        Entities.ForEach((ref Rotation rotation, ref SteeringInput steerInput) => {
+        Entities.WithNone<AngularVelocity>().ForEach((ref Rotation rotation, ref SteeringInput steerInput) => {
             var forward = rotation.Value.forward();
             var up = rotation.Value.up();
             var left = rotation.Value.left();
-            //var q = quaternion.identity;
-            //q *= (Quaternion)quaternion.AxisAngle(left, steerInput.pitch * Time.deltaTime) ;
-            //q *= (Quaternion)quaternion.AxisAngle(up, steerInput.yaw * Time.deltaTime) ;
-            //q *= (Quaternion)quaternion.AxisAngle(forward, steerInput.roll * Time.deltaTime) ;
+
             var r = new float3(steerInput.pitch * Time.deltaTime, steerInput.yaw * Time.deltaTime, steerInput.roll * Time.deltaTime);
             rotation.Value *= Quaternion.Euler(r);
+        });
+
+        Entities.ForEach((ref Rotation rotation, ref SteeringInput steerInput, ref AngularVelocity angularVelocity) => {
+            var forward = rotation.Value.forward();
+            var up = rotation.Value.up();
+            var left = rotation.Value.left();
+
+            angularVelocity.Value = new float3(
+                angularVelocity.Value.x * steerInput.pitch * Time.deltaTime,
+                angularVelocity.Value.y * steerInput.yaw * Time.deltaTime,
+                angularVelocity.Value.z * steerInput.roll * Time.deltaTime) * 0.01f;
+            rotation.Value *= Quaternion.Euler(angularVelocity.Value);
         });
     }
 }

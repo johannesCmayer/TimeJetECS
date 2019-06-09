@@ -16,7 +16,6 @@ public class UnitEnityDefinitions
     public static EntityArchetype friendlyPlaneArechetype;
     public static EntityArchetype enemyPlaneArechetype;
     public static EntityArchetype missileArechetype;
-    //public static EntityArchetype meshChild;
     static bool isSetup;
     static EntityManager entityManager;
 
@@ -98,18 +97,6 @@ public class UnitEnityDefinitions
 
             typeof(SphereCollider)
         );
-
-        //meshChild = entityManager.CreateArchetype(
-        //    typeof(RenderMesh),
-
-        //    typeof(LocalToWorld),
-        //    typeof(LocalToParent),
-        //    typeof(Parent),
-
-        //    typeof(Translation),
-        //    typeof(Rotation),
-        //    typeof(Scale)
-        //);
     }
 
     public static NativeArray<Entity> SetupPlanes(EntityArchetype a, int amount, Mesh mesh, Material material)
@@ -126,7 +113,7 @@ public class UnitEnityDefinitions
             entityManager.SetComponentData(plane, new Scale { Value = 1f });
             entityManager.SetComponentData(plane, new SphereCollider { size = 1f });
             entityManager.SetComponentData(plane, new MoveSpeed { Value = new float3(0, 0, 0f) });
-            entityManager.SetComponentData(plane, new Velocity { Value = new float3(0, 0, 1f) });
+            //entityManager.SetComponentData(plane, new Velocity { Value = new float3(0, 0, 1f) });
             entityManager.SetSharedComponentData(plane, new RenderMesh
             {
                 mesh = mesh,
