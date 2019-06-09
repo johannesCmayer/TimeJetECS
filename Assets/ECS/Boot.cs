@@ -17,11 +17,11 @@ public class Boot : MonoBehaviour
     void Start()
     {
         entityManager = World.Active.EntityManager;
-        print($"eman {entityManager}");
         var gd = GlobalData.instance;
-        print($"global data {gd}");
 
-        var player = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.playerPlaneArechetype, 1, gd.friendlyPlaneMesh, gd.friendlyPlaneMaterial)[0];
+        var player = entityManager.Instantiate(UnitEnityDefinitions.playerPrefab);
+        entityManager.SetComponentData(player, new Translation { Value = float3.zero });
+
         //var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 100, gd.EnemyPlaneMesh, gd.enemyPlaneMaterial);
 
         //for (int i = 0; i < enemyPlanes.Length; i++)

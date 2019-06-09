@@ -17,7 +17,7 @@ public class SteeringSystem : ComponentSystem
         Entities.WithNone<AngularVelocity>().ForEach((ref Rotation rotation, ref SteeringInput steerInput) => {
             var forward = rotation.Value.forward();
             var up = rotation.Value.up();
-            var left = rotation.Value.left();
+            var left = rotation.Value.right();
 
             var r = new float3(steerInput.pitch * Time.deltaTime, steerInput.yaw * Time.deltaTime, steerInput.roll * Time.deltaTime);
             rotation.Value *= Quaternion.Euler(r);
@@ -26,7 +26,7 @@ public class SteeringSystem : ComponentSystem
         Entities.ForEach((ref Rotation rotation, ref SteeringInput steerInput, ref AngularVelocity angularVelocity) => {
             var forward = rotation.Value.forward();
             var up = rotation.Value.up();
-            var left = rotation.Value.left();
+            var left = rotation.Value.right();
 
             angularVelocity.Value = new float3(
                 angularVelocity.Value.x * steerInput.pitch * Time.deltaTime,

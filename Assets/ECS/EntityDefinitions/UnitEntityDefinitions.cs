@@ -12,6 +12,8 @@ using Unity.Burst;
 
 public class UnitEnityDefinitions
 {
+    public static Entity playerPrefab;
+
     public static EntityArchetype playerPlaneArechetype;
     public static EntityArchetype friendlyPlaneArechetype;
     public static EntityArchetype enemyPlaneArechetype;
@@ -30,6 +32,7 @@ public class UnitEnityDefinitions
 
         playerPlaneArechetype = entityManager.CreateArchetype(
             typeof(PlayerTag),
+            typeof(Prefab),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -43,6 +46,8 @@ public class UnitEnityDefinitions
             typeof(SphereCollider),
             typeof(RenderMesh)
         );
+
+        playerPrefab = SetupPlanes(playerPlaneArechetype, 1, GlobalData.instance.friendlyPlaneMesh, GlobalData.instance.friendlyPlaneMaterial)[0];
 
         friendlyPlaneArechetype = entityManager.CreateArchetype(
             typeof(FriendlyAITag),

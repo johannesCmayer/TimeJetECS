@@ -29,7 +29,7 @@ public class MovementSystem : JobComponentSystem
         public float dt;
         public void Execute(ref Translation translation, [ReadOnly] ref MoveSpeed moveSpeed, [ReadOnly] ref Rotation rotation)
         {
-            var x = rotation.Value.left() * moveSpeed.Value.x;
+            var x = rotation.Value.right() * moveSpeed.Value.x;
             var y = rotation.Value.up() * moveSpeed.Value.y;
             var z = rotation.Value.forward() * moveSpeed.Value.z;
             translation.Value += (x + y + z) * dt;
@@ -55,11 +55,30 @@ public class VelocityMovementSystem : JobComponentSystem
         public float dt;
         public void Execute(ref Translation translation, [ReadOnly] ref MoveSpeed moveSpeed, [ReadOnly] ref Rotation rotation, ref Velocity velocity)
         {
-            var x = rotation.Value.left() * moveSpeed.Value.x;
+            var x = rotation.Value.right() * moveSpeed.Value.x;
             var y = rotation.Value.up() * moveSpeed.Value.y;
             var z = rotation.Value.forward() * moveSpeed.Value.z;
+
             velocity.Value += (x + y + z) * dt;
             translation.Value += velocity.Value * dt;
         }
     }
+}
+
+public class DebugDirVecs : ComponentSystem
+{
+    protected override void OnUpdate()
+    {
+        Entities.ForEach((ref Rotation r, ref Translation t) =>
+        {
+            var dir = new float3[] { r.Value.forward(), r.Value.up(), r.Value.right() };
+            var colors = new Color[] { Color.blue, Color.green, Color.red };
+
+            for (int i = 0; i < dir.Length; i++)
+            {
+                Debug.DrawLine(t.Value, t.Value + dir[i] * 2, colors[i]);
+            }
+        });
+    }
+
 }

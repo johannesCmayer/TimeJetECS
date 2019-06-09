@@ -18,7 +18,7 @@ public class PlayerCamearSystem : ComponentSystem
         Entities.WithAll<PlayerTag>().ForEach((ref Translation translation, ref Rotation rotation) => {
             var forward = rotation.Value.forward();
             var up = rotation.Value.up();
-            var left = rotation.Value.left();
+            var left = rotation.Value.right();
             // var camOffset = up + forward * -3 + left;
             var camOffset = float3.zero;
 
