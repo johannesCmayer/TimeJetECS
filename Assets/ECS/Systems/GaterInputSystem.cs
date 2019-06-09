@@ -20,7 +20,7 @@ public class GatherTranslationInputSystem : ComponentSystem
         {
             moveSpeed = new MoveSpeed
             {
-                Value = new float3(Input.GetAxis("Horizontal") * this.moveSpeed, Input.GetAxis("Vertical") * this.moveSpeed, Input.GetAxis("Thrust") * this.moveSpeed)
+                Value = new float3(Input.GetAxis("ThrustX") * this.moveSpeed, Input.GetAxis("ThrustY") * this.moveSpeed, Input.GetAxis("ThrustZ") * this.moveSpeed)
             };
         });
     }

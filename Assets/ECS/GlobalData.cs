@@ -32,6 +32,10 @@ public class GlobalData : MonoBehaviour
     [Header("Effects/Prebafs")]
     public GameObject TrailRenderer;
 
+    [Header("Deubg")]
+    public Mesh SphereColliderDisplayMesh;
+    public Material SphereColliderDisplayMaterial;
+
     public static GlobalData instance;
 
     private void Awake()

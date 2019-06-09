@@ -65,20 +65,3 @@ public class VelocityMovementSystem : JobComponentSystem
     }
 }
 
-public class DebugDirVecs : ComponentSystem
-{
-    protected override void OnUpdate()
-    {
-        Entities.ForEach((ref Rotation r, ref Translation t) =>
-        {
-            var dir = new float3[] { r.Value.forward(), r.Value.up(), r.Value.right() };
-            var colors = new Color[] { Color.blue, Color.green, Color.red };
-
-            for (int i = 0; i < dir.Length; i++)
-            {
-                Debug.DrawLine(t.Value, t.Value + dir[i] * 2, colors[i]);
-            }
-        });
-    }
-
-}

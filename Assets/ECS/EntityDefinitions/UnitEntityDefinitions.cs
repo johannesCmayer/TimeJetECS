@@ -54,6 +54,7 @@ public class UnitEnityDefinitions
 
             typeof(MoveSpeed),
             typeof(Velocity),
+            typeof(AngularVelocity),
             typeof(TargetSelection),
             typeof(TurnTowardsTarget),
 

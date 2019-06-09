@@ -9,13 +9,3 @@ using Unity.Mathematics;
 using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
-
-public class DebugDrawSphereColliders : ComponentSystem
-{
-    protected override void OnUpdate()
-    {
-        Entities.ForEach((ref Translation t, ref SphereCollider c) => {
-            
-        });
-    }
-}
