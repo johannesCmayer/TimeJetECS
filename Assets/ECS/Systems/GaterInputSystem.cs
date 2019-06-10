@@ -12,7 +12,7 @@ using Unity.Burst;
 
 public class GatherTranslationInputSystem : ComponentSystem
 {
-    float moveSpeed = 6;
+    const float moveSpeedCoef = 6;
 
     protected override void OnUpdate()
     {
@@ -20,7 +20,7 @@ public class GatherTranslationInputSystem : ComponentSystem
         {
             moveSpeed = new MoveSpeed
             {
-                Value = new float3(Input.GetAxis("ThrustX") * this.moveSpeed, Input.GetAxis("ThrustY") * this.moveSpeed, Input.GetAxis("ThrustZ") * this.moveSpeed)
+                Value = new float3(Input.GetAxis("ThrustX") * moveSpeedCoef, Input.GetAxis("ThrustY") * moveSpeedCoef, Input.GetAxis("ThrustZ") * moveSpeedCoef)
             };
         });
     }
@@ -30,7 +30,7 @@ public class SimpleGaterRotationInputSystem : ComponentSystem
 {
     const float pitchSpeed = 100;
     const float rollSpeed = 2000;
-    const float yawSpeed = 100;    
+    const float yawSpeed = 100;
 
     const float steerPosSensitivity = 20;
     const float steerPosMaxDistFromCenter = 20;
@@ -44,9 +44,22 @@ public class SimpleGaterRotationInputSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        var mouseX = Input.GetAxis("Mouse X");
-        var mouseY = Input.GetAxis("Mouse Y");
+        if (Input.GetButtonDown("MouseLock"))
+        {
+            if (Cursor.lockState == CursorLockMode.None)
+                Cursor.lockState = CursorLockMode.Locked;
+            else
+                Cursor.lockState = CursorLockMode.None;
+        }
 
+        float mouseX = 0;
+        float mouseY = 0;
+
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            mouseX = Input.GetAxis("Mouse X");
+            mouseY = Input.GetAxis("Mouse Y");
+        }
         
         steerPos += new float2(mouseX, mouseY) * Time.deltaTime * steerPosSensitivity;
         if (math.length(steerPos) > steerPosMaxDistFromCenter)
@@ -56,6 +69,17 @@ public class SimpleGaterRotationInputSystem : ComponentSystem
 
         Entities.WithAll<PlayerTag>().ForEach((ref SteeringInput steerInput) =>
         {
+            
+            if (Cursor.lockState != CursorLockMode.Locked)
+            {
+                steerInput = new SteeringInput
+                {
+                    pitch = 0,
+                    roll = 0,
+                    yaw = 0
+                };
+                return;
+            }
 
             steerInput = new SteeringInput
             {

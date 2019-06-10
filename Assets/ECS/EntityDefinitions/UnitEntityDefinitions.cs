@@ -36,6 +36,7 @@ public class UnitEnityDefinitions
 
             typeof(MoveSpeed),
             typeof(Velocity),
+            typeof(AngularVelocity),
             typeof(SteeringInput),
 
             typeof(Translation),
@@ -54,7 +55,6 @@ public class UnitEnityDefinitions
 
             typeof(MoveSpeed),
             typeof(Velocity),
-            typeof(AngularVelocity),
             typeof(TargetSelection),
             typeof(TurnTowardsTarget),
 
