@@ -23,12 +23,12 @@ public class RenderTest : MonoBehaviour
     public Camera back;
 
     int2[] resolutions = new int2[] {
-        new int2(512, 512),
+        new int2(512, 512) * 1,
         new int2(512, 512) * 2,
-        new int2(512, 512),
-        new int2(512, 512),
-        new int2(512, 512),
-        new int2(512, 512),};
+        new int2(512, 512) * 2,
+        new int2(512, 512) * 2,
+        new int2(512, 512) * 2,
+        new int2(512, 512) * 2,};
 
     Camera[] cameras;
     RenderTexture[] renderTextures = new RenderTexture[6];
