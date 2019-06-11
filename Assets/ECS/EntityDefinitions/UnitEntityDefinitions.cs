@@ -49,6 +49,12 @@ public class UnitEnityDefinitions
         );
 
         playerPrefab = SetupPlanes(playerPlaneArechetype, 1, GlobalData.instance.friendlyPlaneMesh, GlobalData.instance.friendlyPlaneMaterial)[0];
+        entityManager.SetSharedComponentData(playerPrefab, new RenderMesh
+        {
+            mesh = GlobalData.instance.friendlyPlaneMesh,
+            material = GlobalData.instance.friendlyPlaneMaterial,
+            layer = 9
+        });
 
         friendlyPlaneArechetype = entityManager.CreateArchetype(
             typeof(FriendlyAITag),

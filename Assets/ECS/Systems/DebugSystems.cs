@@ -28,7 +28,7 @@ public class DebugDrawLocalDirVecs : ComponentSystem
     }
 }
 
-//[DisableAutoCreation]
+[DisableAutoCreation]
 public class DebugDrawSphereColliders : ComponentSystem
 {
     protected override void OnUpdate()

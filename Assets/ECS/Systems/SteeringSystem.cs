@@ -11,6 +11,7 @@ using Unity.Collections;
 using Unity.Burst;
 
 //TODO Jobify
+[UpdateInGroup(typeof(TransformSystemGroup))]
 public class SteeringSystem : ComponentSystem
 {
     const float additionalForceWhenBreaking = 0;

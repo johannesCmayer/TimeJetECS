@@ -10,6 +10,7 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
+[UpdateInGroup(typeof(CTransformSystemGroup))]
 public class MovementSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -37,6 +38,7 @@ public class MovementSystem : JobComponentSystem
     }
 }
 
+[UpdateInGroup(typeof(CTransformSystemGroup))]
 public class VelocityMovementSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)

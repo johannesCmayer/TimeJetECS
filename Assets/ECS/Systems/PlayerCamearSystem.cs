@@ -11,9 +11,7 @@ using Unity.Collections;
 using Unity.Burst;
 
 [UpdateInGroup(typeof(PresentationSystemGroup))]
-[UpdateAfter(typeof(SteeringSystem))]
-[UpdateAfter(typeof(VelocityMovementSystem))]
-[UpdateAfter(typeof(MovementSystem))]
+[UpdateBefore(typeof(RenderMeshSystemV2))]
 public class PlayerCamearSystem : ComponentSystem
 {
     public GameObject playerCamRoot;
@@ -36,7 +34,7 @@ public class PlayerCamearSystem : ComponentSystem
 
             var camTrans = playerCamRoot.transform;
             camTrans.rotation = rotation.Value;
-            camTrans.position = translation.Value +  camOffset;            
+            camTrans.position = translation.Value +  camOffset;
         });
     }
 }

@@ -10,6 +10,7 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
+[UpdateInGroup(typeof(CTransformSystemGroup))]
 public class TurnTowardsTargetSystem : JobComponentSystem
 {
     EndSimulationEntityCommandBufferSystem endSimulationEntityCommandBufferSystem;

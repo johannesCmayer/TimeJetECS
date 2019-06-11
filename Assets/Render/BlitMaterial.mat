@@ -56,27 +56,27 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RenderTex0:
-        m_Texture: {fileID: 8400000, guid: a07f67d17f6ea8c42aa296dac4823bad, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RenderTex1:
-        m_Texture: {fileID: 8400000, guid: 7a9dfa1edcb692e49a232f6fda7d7f2c, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RenderTex2:
-        m_Texture: {fileID: 8400000, guid: 34e0afc8de9b6444bbac6aac1ed74d56, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RenderTex3:
-        m_Texture: {fileID: 8400000, guid: 2ca53c029673fb54e94bfdbffa21a5e1, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RenderTex4:
-        m_Texture: {fileID: 8400000, guid: 0338f267df7a4da44b2bf7605f0c0e53, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RenderTex5:
-        m_Texture: {fileID: 8400000, guid: 891898c0e0021374f8238c5b2403d3eb, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
