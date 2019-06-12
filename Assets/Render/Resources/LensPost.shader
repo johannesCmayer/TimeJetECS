@@ -18,9 +18,9 @@
 		[HideInInspector] _Blue("Blue", Vector) = (0.336, 0.722893, 1, 1)
 		[HideInInspector] _Yellow("Yellow", Vector) = (1, 1, 0, 1)
 		[HideInInspector] _Purple("Purple", Vector) = (0.2833333, 0, 1, 1)
-		[HideInInspector] _Orange("Orange", Vector) = (255, 154, 0, 255)
+		[HideInInspector] _Orange("Orange", Vector) = (1, 0.6, 0, 1)
 
-		[HideInInspector] _ErrCol("Orange", Vector) = (1, 0, 0, 255)
+		[HideInInspector] _ErrCol("Orange", Vector) = (1, 0, 0, 1)
 		[HideInInspector] _NotMappedCol("Orange", Vector) = (0.1, 0, 0.33, 1)
 
 		_Zoom("Zoom Factor", float) = 1
@@ -250,12 +250,13 @@
 		return uv - 0.5;
 	}
 
-	/*float4 debugGrid(float4 color, float2 uv)
+	float4 debugGrid(float4 color, float2 uv)
 	{
+		float4 tiling_scale = float4(1, 1, 0, 0);
 		float4 debugCol = color * _DebugColCoef;
-		debugCol *= 1 - tex2D(_DebugProjectionTexAlpha, uv * _DebugProjectionTexAlpha_ST.xy + _DebugProjectionTexAlpha_ST.zw).x;
+		debugCol *= SAMPLE_TEXTURE2D(_DebugProjectionTexAlpha, sampler_DebugProjectionTexAlpha, uv * tiling_scale.xy + tiling_scale.zw).x;
 		return debugCol;
-	}*/
+	}
 
 	float4 dirVecToCol(float3 dirVec)
 	{
@@ -281,14 +282,14 @@
 			x <= bounds && x >= -bounds &&
 			y <= bounds && y >= -bounds)
 		{
-			return SAMPLE_TEXTURE2D(_RenderTex0, sampler_RenderTex0, uv);// +debugGrid(_Red, uv);
+			return SAMPLE_TEXTURE2D(_RenderTex0, sampler_RenderTex0, uv) + debugGrid(_Red, uv);
 		}
 		uv = CenteredUVToUV(-x, y);
 		if (dirVec.z < 0 &&
 			x <= bounds && x >= -bounds &&
 			y <= bounds && y >= -bounds)
 		{
-			return SAMPLE_TEXTURE2D(_RenderTex5, sampler_RenderTex5, uv);// + debugGrid(_Green, uv);
+			return SAMPLE_TEXTURE2D(_RenderTex5, sampler_RenderTex5, uv) + debugGrid(_Green, uv);
 		}
 		
 		x = left.z;
@@ -298,14 +299,14 @@
 			x <= bounds && x >= -bounds &&
 			y <= bounds && y >= -bounds)
 		{
-			return SAMPLE_TEXTURE2D(_RenderTex2, sampler_RenderTex2, uv);// + debugGrid(_Blue, uv);
+			return SAMPLE_TEXTURE2D(_RenderTex2, sampler_RenderTex2, uv) + debugGrid(_Blue, uv);
 		}
 		uv = CenteredUVToUV(x, y);
 		if (dirVec.x < 0 &&
 			x <= bounds && x >= -bounds &&
 			y <= bounds && y >= -bounds)
 		{
-			return SAMPLE_TEXTURE2D(_RenderTex1, sampler_RenderTex1, uv);// + debugGrid(_Yellow, uv);
+			return SAMPLE_TEXTURE2D(_RenderTex1, sampler_RenderTex1, uv) + debugGrid(_Yellow, uv);
 		}
 		
 		x = down.x;
@@ -316,14 +317,14 @@
 			y <= bounds && y >= -bounds)
 		{
 
-			return SAMPLE_TEXTURE2D(_RenderTex3, sampler_RenderTex3, uv);// + debugGrid(_Purple, uv);
+			return SAMPLE_TEXTURE2D(_RenderTex3, sampler_RenderTex3, uv) + debugGrid(_Purple, uv);
 		}
 		uv = CenteredUVToUV(x, y);
 		if (dirVec.y < 0 &&
 			x <= bounds && x >= -bounds &&
 			y <= bounds && y >= -bounds)
 		{
-			return SAMPLE_TEXTURE2D(_RenderTex4, sampler_RenderTex4, uv);// + debugGrid(_Orange, uv);
+			return SAMPLE_TEXTURE2D(_RenderTex4, sampler_RenderTex4, uv) + debugGrid(_Orange, uv);
 		}
 
 		return _ErrCol;

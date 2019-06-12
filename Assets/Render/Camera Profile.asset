@@ -86,16 +86,6 @@ MonoBehaviour:
   enabled:
     overrideState: 1
     value: 1
-  lens: 0
-  zoom:
-    overrideState: 1
-    value: 5.27
-  imageScale:
-    overrideState: 1
-    value: 1.71
-  debugGridOpacity:
-    overrideState: 1
-    value: 1.94
   forward:
     overrideState: 1
     value: {fileID: 8400000, guid: e8c32c7d5991b0b459f1083bb91127cd, type: 2}
@@ -120,6 +110,18 @@ MonoBehaviour:
     overrideState: 1
     value: {fileID: 8400000, guid: a9e3ab54128cbcc4f9b0ea652a17b0a4, type: 2}
     defaultState: 1
+  zoom:
+    overrideState: 1
+    value: 4.42
+  imageScale:
+    overrideState: 1
+    value: 1
+  showDebugGrid:
+    overrideState: 1
+    value: 0
+  debugGridOpacity:
+    overrideState: 0
+    value: 0.2
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

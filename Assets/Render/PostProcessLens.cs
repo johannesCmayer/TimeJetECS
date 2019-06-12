@@ -22,19 +22,21 @@ public enum Lens
 [PostProcess(typeof(PostProcessLensRenderer), PostProcessEvent.BeforeStack, "LensProjection")]
 public sealed class PostProcessLens : PostProcessEffectSettings
 {
-    public Lens lens = Lens.FishEye2;
-
-    public FloatParameter zoom = new FloatParameter { value = 2 };
-    public FloatParameter imageScale = new FloatParameter { value = 1 };
-    public FloatParameter debugGridOpacity = new FloatParameter { value = 0 };
-
-    [Header("Render Texures")]
+    [Header("Render Texure Inputs")]
     public TextureParameter forward = new TextureParameter();
     public TextureParameter left = new TextureParameter();
     public TextureParameter right = new TextureParameter();
     public TextureParameter up = new TextureParameter();
     public TextureParameter down = new TextureParameter();
     public TextureParameter back = new TextureParameter();
+
+    [Header("Parameters")]
+    public FloatParameter zoom = new FloatParameter { value = 2 };
+    public FloatParameter imageScale = new FloatParameter { value = 1 };
+
+    [Header("Debug")]
+    public BoolParameter showDebugGrid = new BoolParameter { value = false };
+    public FloatParameter debugGridOpacity = new FloatParameter { value = 0.2f };
 }
 
 public sealed class PostProcessLensRenderer : PostProcessEffectRenderer<PostProcessLens>
@@ -46,6 +48,9 @@ public sealed class PostProcessLensRenderer : PostProcessEffectRenderer<PostProc
     //    new int2(512, 512) * 2,
     //    new int2(512, 512) * 2,
     //    new int2(512, 512) * 2,};
+    
+
+    internal Texture2D debugGridTexture = new Texture2D(14, 14);
 
     RenderTexture[] renderTextures = new RenderTexture[6];
 
@@ -53,6 +58,19 @@ public sealed class PostProcessLensRenderer : PostProcessEffectRenderer<PostProc
 
     public override void Init()
     {
+        for (int i = 0; i < debugGridTexture.width; i++)
+        {
+            for (int j = 0; j < debugGridTexture.height; j++)
+            {
+                Color col = new Color(1, 1, 1, 1);
+                if ((i+1) % 3 == 0 || (j+1) % 3 == 0)
+                    col = new Color(0, 0, 0, 0);
+                debugGridTexture.SetPixel(i, j, col);
+            }
+        }
+        debugGridTexture.Apply();
+        debugGridTexture.filterMode = FilterMode.Point;
+
         renderTextures = new RenderTexture[] {
             (RenderTexture)settings.forward.value,
             (RenderTexture)settings.left,
@@ -74,8 +92,9 @@ public sealed class PostProcessLensRenderer : PostProcessEffectRenderer<PostProc
             lensShader.properties.SetTexture($"_RenderTex{i}", renderTextures[i]);
         }
         lensShader.properties.SetFloat("_Zoom", settings.zoom);
-        lensShader.properties.SetFloat("_DebugColCoef", settings.debugGridOpacity);
+        lensShader.properties.SetFloat("_DebugColCoef", settings.showDebugGrid.value ? settings.debugGridOpacity : 0f);
         lensShader.properties.SetFloat("_ImgScale", settings.imageScale);
+        lensShader.properties.SetTexture("_DebugProjectionTexAlpha", debugGridTexture);
 
         context.command.BlitFullscreenTriangle(emptyTargetIdentifier, context.destination, lensShader, 0);
     }
