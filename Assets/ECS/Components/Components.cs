@@ -16,9 +16,20 @@ public struct EnemyAITag : IComponentData { }
 public struct MissileTag : IComponentData { }
 public struct HasTrailTag : IComponentData { }
 public struct ExplosionTag : IComponentData { }
+public struct Alive : IComponentData { }
+public struct Respawn : IComponentData {
+    public float3 pos;
+    public Entity prefab;
+}
 
 public struct TrailSystemState : ISystemStateComponentData {
     public int trailIdx;
+}
+
+public struct RespawnSystemState : ISystemStateComponentData
+{
+    public float3 pos;
+    public Entity prefab;
 }
 
 public struct Velocity : IComponentData

@@ -33,6 +33,8 @@ public class UnitEnityDefinitions
         playerPlaneArechetype = entityManager.CreateArchetype(
             typeof(PlayerTag),
             typeof(Prefab),
+            typeof(Alive),
+            typeof(Respawn),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -55,9 +57,15 @@ public class UnitEnityDefinitions
             material = GlobalData.instance.friendlyPlaneMaterial,
             layer = 9
         });
+        entityManager.SetComponentData(playerPrefab, new Respawn {
+            pos = new float3(0, 0, -100),
+            prefab = playerPrefab
+        });
 
         friendlyPlaneArechetype = entityManager.CreateArchetype(
             typeof(FriendlyAITag),
+            typeof(Respawn),
+            typeof(Alive),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -75,6 +83,8 @@ public class UnitEnityDefinitions
 
         enemyPlaneArechetype = entityManager.CreateArchetype(
             typeof(EnemyAITag),
+            typeof(Respawn),
+            typeof(Alive),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -92,7 +102,7 @@ public class UnitEnityDefinitions
 
         missileArechetype = entityManager.CreateArchetype(
             typeof(MissileTag),
-            typeof(HasTrailTag),           
+            typeof(HasTrailTag),
 
             typeof(MoveSpeed),
             typeof(Velocity),

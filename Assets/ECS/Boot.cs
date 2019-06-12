@@ -20,7 +20,7 @@ public class Boot : MonoBehaviour
         var gd = GlobalData.instance;
 
         var player = entityManager.Instantiate(UnitEnityDefinitions.playerPrefab);
-        entityManager.SetComponentData(player, new Translation { Value = float3.zero });
+        entityManager.SetComponentData(player, new Translation { Value = new float3(0, 0, -30) });
 
         var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 100, gd.EnemyPlaneMesh, gd.enemyPlaneMaterial);
 
