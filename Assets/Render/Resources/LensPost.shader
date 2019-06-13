@@ -62,29 +62,19 @@
 
 	float _AspectRatio;
 
-#define NOCOLVEC float3(0, 0, 0)
-
-	float2 ray_to_latlon(float3 ray)
-	{
-		float lat = atan2(ray.z, sqrt(pow(ray.x, 2) + pow(ray.y, 2)));
-		float lon = atan2(ray.y, ray.x);
-		return float2(lat, lon);
-	}
+	#define NOCOLVEC float3(0, 0, 0)
 
 	float3 latlon_to_ray(float2 latlon)
 	{
-		float x = cos(latlon.x) * cos(latlon.y);
-		float y = cos(latlon.x) * sin(latlon.y);
-		float z = sin(latlon.x);
-		return float3(y, z, x);
-	}
-
-	float3 latlon_to_ray_orig(float2 latlon)
-	{
-		float x = cos(latlon.x) * cos(latlon.y);
-		float y = cos(latlon.x) * sin(latlon.y);
-		float z = sin(latlon.x);
+		float x = sin(latlon.y) * cos(latlon.x);
+		float y = sin(latlon.x);
+		float z = cos(latlon.y) * cos(latlon.x);
 		return float3(x, y, z);
+	}
+	float2 ray_to_latlon(float3 dir)
+	{
+		return float2(atan2(dir.y, length(float2(dir.z, dir.x))),
+			          atan2(dir.x, dir.z));
 	}
 
 	// LENSES_____________________START
@@ -148,30 +138,42 @@
 		return float2(x, y);
 	}
 
-	float3 winkelTripel_inv(float2 uv)
+	bool cull(float x, float y)
 	{
-		float x = uv.x;
-		float y = uv.y;
-
-		float2 f1 = winkelTripel_forward(latlon_to_ray_orig(float2(PI / 2, 0)));
+		float2 f1 = winkelTripel_forward(latlon_to_ray(float2(PI / 2, 0)));
 		float lens_height = 2 * f1.y;
 
-		float2 f2 = winkelTripel_forward(latlon_to_ray_orig(float2(0, PI)));
+		float2 f2 = winkelTripel_forward(latlon_to_ray(float2(0, PI)));
 		float lens_width = 2 * f2.x;
-		
+
 		if (abs(y) >= lens_height / 2)
 		{
-			return NOCOLVEC;
+			return true;
 		}
-		
+
 		if (abs(x) + abs(y) > 0.5f)
 		{
 			float2 n_uv = normalize(float2(x, y));
 			float2 c_uv = float2(x, y) * float2(0.68, 1);
 			if (length(c_uv - n_uv) >= 0.8)
 			{
-				return NOCOLVEC;
+				return true;
 			}
+		}
+		return false;
+	}
+
+	float3 winkelTripel_inv(float2 uv)
+	{
+		//float3 temp = latlon_to_ray(uv);
+		//uv = ray_to_latlon(temp);
+
+		float x = uv.x;
+		float y = uv.y;
+
+		if (cull(x, y))
+		{
+			return NOCOLVEC;
 		}
 
 		float lambda = x;
@@ -236,7 +238,7 @@
 		float u = uv.x;
 		float v = uv.y;
 
-		float r = sqrt(u*u + v * v);
+		float r = sqrt(u * u + v * v);
 		float theta = r;
 		float s = sin(theta);
 
@@ -266,6 +268,20 @@
 		return float3(x / r * s, y / r * s, cos(theta));
 	}
 
+	float3 psudo_inv(float2 uv)
+	{
+		float r = length(uv);
+
+		if (r > 2.5)
+		{
+			return NOCOLVEC;
+		}
+
+		return float3(
+			sin(uv.x), 
+			sin(uv.y),
+			cos(r));
+	}
 
 	float3 prism_inv(float2 uv)
 	{
@@ -385,7 +401,8 @@
 
 		//float3 dirVec = fisheye_2_inv(centeredUV);
 		//float3 dirVec = hammer_inv(centeredUV);
-		float3 dirVec = winkelTripel_inv(centeredUV);
+		//float3 dirVec = winkelTripel_inv(centeredUV);
+		float3 dirVec = psudo_inv(centeredUV);
 		float4 col = dirVecToCol(dirVec);
 		return col;
 	}

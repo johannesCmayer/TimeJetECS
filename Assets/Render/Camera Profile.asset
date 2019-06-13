@@ -112,13 +112,16 @@ MonoBehaviour:
     defaultState: 1
   zoom:
     overrideState: 1
-    value: 4.42
-  imageScale:
-    overrideState: 1
-    value: 1
+    value: 5.38
+  lenseStretchX:
+    overrideState: 0
+    value: 0
+  lenseStretchY:
+    overrideState: 0
+    value: 0
   showDebugGrid:
     overrideState: 1
-    value: 0
+    value: 1
   debugGridOpacity:
     overrideState: 0
     value: 0.2
