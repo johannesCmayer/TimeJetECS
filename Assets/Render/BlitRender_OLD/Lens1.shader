@@ -85,9 +85,7 @@
 
 			float _Zoom;
 			float _DebugColCoef;
-
-			float4 not_mapped_col() { return float4(0.5, 0.2, 0.5, 1); }
-
+			
 			v2f vert(appdata v)
 			{
 				v2f o;
@@ -117,7 +115,6 @@
 			{
 				float d = 1;
 
-				uv *= _Zoom;
 				float x = uv.x;
 				float y = uv.y;
 
@@ -198,8 +195,6 @@
 
 			float3 fisheye_inv(float2 uv)
 			{				
-				uv = uv * _Zoom;
-
 				float u = uv.x;
 				float v = uv.y;
 
@@ -221,8 +216,6 @@
 			{
 				const float maxr = 2 * sin(PI*0.5);
 
-				uv = uv * _Zoom;
-
 				float x = uv.x;
 				float y = uv.y;
 
@@ -241,19 +234,17 @@
 
 			float3 prism_inv(float2 uv)
 			{
-				float coef = _Zoom * 8;
+				float coef = 8;
 				return normalize(float3(sin(uv.x * coef), sin(uv.y * coef), cos(uv.x * coef)));
 			}
 
 			float3 octagonZoom_inv(float2 uv)
 			{
-				uv = uv * _Zoom;
 				return normalize(float3(uv.x, uv.y, 1 - abs(uv.x) - abs(uv.y)));
 			}
 
 			float3 stereo_inv(float2 uv)
 			{
-				uv = uv * _Zoom;
 				return normalize(float3(uv.x, uv.y, cos(uv.x)));
 			}
 

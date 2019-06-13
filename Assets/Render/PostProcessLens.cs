@@ -32,7 +32,8 @@ public sealed class PostProcessLens : PostProcessEffectSettings
 
     [Header("Parameters")]
     public FloatParameter zoom = new FloatParameter { value = 2 };
-    public FloatParameter imageScale = new FloatParameter { value = 1 };
+    public FloatParameter lenseStretchX = new FloatParameter { value = 0 };
+    public FloatParameter lenseStretchY = new FloatParameter { value = 0 };
 
     [Header("Debug")]
     public BoolParameter showDebugGrid = new BoolParameter { value = false };
@@ -92,9 +93,13 @@ public sealed class PostProcessLensRenderer : PostProcessEffectRenderer<PostProc
             lensShader.properties.SetTexture($"_RenderTex{i}", renderTextures[i]);
         }
         lensShader.properties.SetFloat("_Zoom", settings.zoom);
+        lensShader.properties.SetFloat("_LenseStretchX", settings.lenseStretchX);
+        lensShader.properties.SetFloat("_LenseStretchY", settings.lenseStretchY);
+        lensShader.properties.SetFloat("_AspectRatio", (float)Screen.width / (float)Screen.height);
         lensShader.properties.SetFloat("_DebugColCoef", settings.showDebugGrid.value ? settings.debugGridOpacity : 0f);
-        lensShader.properties.SetFloat("_ImgScale", settings.imageScale);
         lensShader.properties.SetTexture("_DebugProjectionTexAlpha", debugGridTexture);
+
+        lensShader.properties.SetFloat("_Time", Time.realtimeSinceStartup);
 
         context.command.BlitFullscreenTriangle(emptyTargetIdentifier, context.destination, lensShader, 0);
     }

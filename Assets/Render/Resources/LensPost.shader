@@ -24,15 +24,14 @@
 		[HideInInspector] _NotMappedCol("Orange", Vector) = (0.1, 0, 0.33, 1)
 
 		_Zoom("Zoom Factor", float) = 1
-		_ImgScale("Image scale", float) = 1
 		_DebugColCoef("Debug color intensity", Range(0, 1)) = 0
 	}
 
 	HLSLINCLUDE
 
-	#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
+#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
 
-	TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
+		TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
 	float _Blend;
 
 	TEXTURE2D_SAMPLER2D(_DebugProjectionTexAlpha, sampler_DebugProjectionTexAlpha);
@@ -56,32 +55,42 @@
 	float4 _NotMappedCol;
 
 	float _Zoom;
-	float _DebugColCoef;
-	float _ImgScale;
+	float _LenseStretchX;
+	float _LenseStretchY;
 
-	#define NOCOLVEC float3(0, 0, 0)
+	float _DebugColCoef;
+
+	float _AspectRatio;
+
+#define NOCOLVEC float3(0, 0, 0)
 
 	float2 ray_to_latlon(float3 ray)
 	{
-		float lat = atan(ray.z / ray.x);
-		float lon = atan(ray.y / ray.z);
+		float lat = atan2(ray.z, sqrt(pow(ray.x, 2) + pow(ray.y, 2)));
+		float lon = atan2(ray.y, ray.x);
 		return float2(lat, lon);
 	}
 
 	float3 latlon_to_ray(float2 latlon)
 	{
-		float x = sin(latlon.x);
-		float y = sin(latlon.y);
-		float z = cos(latlon.x);
-		return normalize(float3(x, y, z));
+		float x = cos(latlon.x) * cos(latlon.y);
+		float y = cos(latlon.x) * sin(latlon.y);
+		float z = sin(latlon.x);
+		return float3(y, z, x);
+	}
+
+	float3 latlon_to_ray_orig(float2 latlon)
+	{
+		float x = cos(latlon.x) * cos(latlon.y);
+		float y = cos(latlon.x) * sin(latlon.y);
+		float z = sin(latlon.x);
+		return float3(x, y, z);
 	}
 
 	// LENSES_____________________START
 
 	float3 hammer_inv(float2 uv)
 	{
-		uv *= _Zoom;
-
 		float x = uv.x;
 		float y = uv.y;
 		if (x*x / 8 + y * y / 2 > 1)
@@ -99,7 +108,6 @@
 	{
 		float d = 1;
 
-		uv *= _Zoom;
 		float x = uv.x;
 		float y = uv.y;
 
@@ -112,80 +120,123 @@
 
 		return latlon_to_ray(float2(lat, lon));
 	}
+		
+	// WinkelTripel ______START
 
-	/*
+	bool is_inside_artifact_box(float x, float y, float lensHeight, float lensWidth)
+	{
+		float artifact_x = lensWidth / 2 * 0.71;
+		float artifact_y = lensHeight / 2 * 0.81;
+
+		return (abs(x) > artifact_x && abs(y) > artifact_y);
+	}
+		
+	float2 winkelTripel_forward(float3 vec)
+	{
+		const float clat0 = 20 / PI;
+
+		float2 latlon = ray_to_latlon(vec);
+		float clat = cos(latlon.x);
+		float temp = clat * cos(latlon.y*0.5);
+		float D = acos(temp);
+		float C = 1 - temp * temp;
+		temp = D / sqrt(C);
+
+		float x = 0.5 * (2 * temp*clat*sin(latlon.y*0.5) + latlon.y * clat0);
+		float y = 0.5 * (temp*sin(latlon.x) + latlon.x);
+
+		return float2(x, y);
+	}
+
 	float3 winkelTripel_inv(float2 uv)
 	{
-	//if abs(y) >= lens_height / 2 then
-	//	return nil
-	//	end
-	//	if is_inside_artifact_box(x, y) then
-	//		return nil
-	//		end
-	float x = uv.x;
-	float y = uv.y;
+		float x = uv.x;
+		float y = uv.y;
 
-	local lambda = x
-	local phi = y
-	eps = 0.0001
-	halfpi = pi / 2
+		float2 f1 = winkelTripel_forward(latlon_to_ray_orig(float2(PI / 2, 0)));
+		float lens_height = 2 * f1.y;
 
-	for iter = 1, 25 do
-	{
-	float cosphi = cos(phi);
-	float sinphi = sin(phi);
-	float sin_2phi = sin(2 * phi);
-	float sin2phi = sinphi * sinphi;
-	float cos2phi = cosphi * cosphi;
-	float sinlambda = sin(lambda);
-	float coslambda_2 = cos(lambda / 2);
-	float sinlambda_2 = sin(lambda / 2);
-	float sin2lambda_2 = sinlambda_2 * sinlambda_2;
-	float C = 1 - cos2phi * coslambda_2 * coslambda_2;
-	float E;
-	float F;
-	if (C ~= 0)
-	{
-	F = 1 / C;
-	E = acos(cosphi * coslambda_2) * sqrt(F);
-	}
-	else
-	{
-	E = 0;
-	F = 0;
-	}
-	float fx = .5 * (2 * E * cosphi * sinlambda_2 + lambda / halfpi) - x;
-	float fy = .5 * (E * sinphi + phi) - y;
-	float sigxsiglambda = .5 * F * (cos2phi * sin2lambda_2 + E * cosphi * coslambda_2 * sin2phi) + .5 / halfpi;
-	float sigxsigphi = F * (sinlambda * sin_2phi / 4 - E * sinphi * sinlambda_2);
-	float sigysiglambda = .125 * F * (sin_2phi * sinlambda_2 - E * sinphi * cos2phi * sinlambda);
-	float sigysigphi = .5 * F * (sin2phi * coslambda_2 + E * sin2lambda_2 * cosphi) + .5;
-	float denominator = sigxsigphi * sigysiglambda - sigysigphi * sigxsiglambda;
-	float siglambda = (fy * sigxsigphi - fx * sigysigphi) / denominator;
-	float sigphi = (fx * sigysiglambda - fy * sigxsiglambda) / denominator;
-	lambda = lambda - siglambda;
-	phi = phi - sigphi;
-	if abs(siglambda) < eps and abs(sigphi) < eps)
-	{
-	break;
-	}
+		float2 f2 = winkelTripel_forward(latlon_to_ray_orig(float2(0, PI)));
+		float lens_width = 2 * f2.x;
+		
+		if (abs(y) >= lens_height / 2)
+		{
+			return NOCOLVEC;
+		}
+		
+		if (abs(x) + abs(y) > 0.5f)
+		{
+			float2 n_uv = normalize(float2(x, y));
+			float2 c_uv = float2(x, y) * float2(0.68, 1);
+			if (length(c_uv - n_uv) >= 0.8)
+			{
+				return NOCOLVEC;
+			}
+		}
+
+		float lambda = x;
+		float phi = y;
+		float eps = 0.0001;
+		float halfpi = PI / 2;
+
+		for(uint i=1; i < 25; i++)
+		{
+			float cosphi = cos(phi);
+			float sinphi = sin(phi);
+			float sin_2phi = sin(2 * phi);
+			float sin2phi = sinphi * sinphi;
+			float cos2phi = cosphi * cosphi;
+			float sinlambda = sin(lambda);
+			float coslambda_2 = cos(lambda / 2);
+			float sinlambda_2 = sin(lambda / 2);
+			float sin2lambda_2 = sinlambda_2 * sinlambda_2;
+			float C = 1 - cos2phi * coslambda_2 * coslambda_2;
+			float E;
+			float F;
+			if (C != 0)
+			{
+				F = 1 / C;
+				E = acos(cosphi * coslambda_2) * sqrt(F);
+			}
+			else
+			{
+				E = 0;
+				F = 0;
+			}
+			float fx = .5 * (2 * E * cosphi * sinlambda_2 + lambda / halfpi) - x;
+			float fy = .5 * (E * sinphi + phi) - y;
+			float sigxsiglambda = .5 * F * (cos2phi * sin2lambda_2 + E * cosphi * coslambda_2 * sin2phi) + .5 / halfpi;
+			float sigxsigphi = F * (sinlambda * sin_2phi / 4 - E * sinphi * sinlambda_2);
+			float sigysiglambda = .125 * F * (sin_2phi * sinlambda_2 - E * sinphi * cos2phi * sinlambda);
+			float sigysigphi = .5 * F * (sin2phi * coslambda_2 + E * sin2lambda_2 * cosphi) + .5;
+			float denominator = sigxsigphi * sigysiglambda - sigysigphi * sigxsiglambda;
+			float siglambda = (fy * sigxsigphi - fx * sigysigphi) / denominator;
+			float sigphi = (fx * sigysiglambda - fy * sigxsiglambda) / denominator;
+			lambda = lambda - siglambda;
+			phi = phi - sigphi;
+			if (abs(siglambda) < eps && abs(sigphi) < eps)
+			{
+				break;
+			}
+		}
+		float lat = phi;
+		float lon = lambda;
+		float2 f = winkelTripel_forward(latlon_to_ray(float2(lat, PI)));
+		if (abs(x) < abs(f.x)) 
+		{
+			return latlon_to_ray(float2(lat, lon));
+		}
+		return NOCOLVEC;
 	}
 
-	lat, lon = phi, lambda
-	x0, y0 = lens_forward(latlon_to_ray(lat, pi))
-	if abs(x) < abs(x0) then
-	return latlon_to_ray(lat, lon)
-	return not_mapped_col();
-	}*/
+	// WinkelTripel ______END
 
 	float3 fisheye_inv(float2 uv)
 	{
-		uv = uv * _Zoom;
-
 		float u = uv.x;
 		float v = uv.y;
 
-		float2 r = sqrt(u*u + v * v);
+		float r = sqrt(u*u + v * v);
 		float theta = r;
 		float s = sin(theta);
 
@@ -199,8 +250,6 @@
 	float3 fisheye_2_inv(float2 uv)
 	{
 		const float maxr = 2 * sin(PI*0.5);
-
-		uv = uv * _Zoom;
 
 		float x = uv.x;
 		float y = uv.y;
@@ -220,19 +269,17 @@
 
 	float3 prism_inv(float2 uv)
 	{
-		float coef = _Zoom * 8;
+		float coef = 8;
 		return normalize(float3(sin(uv.x * coef), sin(uv.y * coef), cos(uv.x * coef)));
 	}
 
 	float3 octagonZoom_inv(float2 uv)
 	{
-		uv = uv * _Zoom;
 		return normalize(float3(uv.x, uv.y, 1 - abs(uv.x) - abs(uv.y)));
 	}
 
 	float3 stereo_inv(float2 uv)
 	{
-		uv = uv * _Zoom;
 		return normalize(float3(uv.x, uv.y, cos(uv.x)));
 	}
 
@@ -332,9 +379,13 @@
 
 	float4 Frag(VaryingsDefault i) : SV_Target
 	{
-		float2 centeredUV = UVToCenteredUV(i.texcoord) / _ImgScale;
+		float2 centeredUV = UVToCenteredUV(i.texcoord) * _Zoom;
+		centeredUV.y /= _AspectRatio;
+		centeredUV *= float2(1 - _LenseStretchX, 1 - _LenseStretchY);
 
-		float3 dirVec = fisheye_2_inv(centeredUV);
+		//float3 dirVec = fisheye_2_inv(centeredUV);
+		//float3 dirVec = hammer_inv(centeredUV);
+		float3 dirVec = winkelTripel_inv(centeredUV);
 		float4 col = dirVecToCol(dirVec);
 		return col;
 	}
