@@ -30,6 +30,7 @@ public class TurnTowardsTargetSystem : JobComponentSystem
 
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
+        
         var turnTowardTargetArray = entityQuery.ToComponentDataArray<TargetSelection>(Allocator.TempJob);
         var targetIsValidArray = new NativeArray<bool>(turnTowardTargetArray.Length, Allocator.TempJob);
         var targetTranslations = new NativeArray<Translation>(turnTowardTargetArray.Length, Allocator.TempJob);
@@ -91,25 +92,25 @@ public class TurnTowardsTargetSystem : JobComponentSystem
 
     [RequireComponentTag(typeof(TurnTowardsTarget), typeof(TargetSelection))]
     [BurstCompile]
-    struct RotateJob : IJobForEachWithEntity<Translation, Rotation, RotationSpeed>
+    struct RotateJob : IJobForEachWithEntity<Translation, Rotation, RotationSpeed, LocalToWorld>
     {
         public float dt;
         [ReadOnly] public NativeArray<bool> targetExists;
         [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<Translation> targetTranslations;
 
-        public void Execute(Entity entity, int index, [ReadOnly] ref Translation translation, ref Rotation rotation, [ReadOnly] ref RotationSpeed rotationSpeed)
+        public void Execute(Entity entity, int index, [ReadOnly] ref Translation translation, ref Rotation rotation, 
+                            [ReadOnly] ref RotationSpeed rotationSpeed, [ReadOnly] ref LocalToWorld localToWorld)
         {
-            if (!targetExists[index])
+            if (!targetExists[index] || math.all(localToWorld.Forward == float3.zero))
             {
                 return;
             }
 
             var targetDir = math.normalize(targetTranslations[index].Value - translation.Value);
-            var forward = rotation.Value.forward();
-            var offset = (targetDir - forward) * rotationSpeed.Value * dt;
-            var newForward = forward + offset;
+            var offset = (targetDir - localToWorld.Forward) * rotationSpeed.Value * dt;
+            var newForward = localToWorld.Forward + offset;
 
-            rotation.Value = quaternion.LookRotation(newForward, rotation.Value.up());
+            rotation.Value = quaternion.LookRotation(newForward, localToWorld.Up);
         }
     }
 }

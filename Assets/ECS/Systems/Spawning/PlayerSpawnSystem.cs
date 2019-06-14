@@ -10,7 +10,7 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
-
+[UpdateInGroup(typeof(SpawningSystemGroup))]
 public class PlayerSpawnSystem : ComponentSystem
 {
     protected override void OnUpdate() {

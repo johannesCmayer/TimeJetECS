@@ -10,11 +10,15 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
+
+
 public struct PlayerTag : IComponentData { }
 public struct FriendlyAITag : IComponentData { }
 public struct EnemyAITag : IComponentData { }
 public struct MissileTag : IComponentData { }
-public struct HasTrailTag : IComponentData { }
+public struct ProjectileTag : IComponentData { }
+public struct UseUnscaledDeltatime : IComponentData { }
+
 public struct ExplosionTag : IComponentData { }
 public struct Alive : IComponentData { }
 public struct Respawn : IComponentData {
@@ -22,7 +26,20 @@ public struct Respawn : IComponentData {
     public Entity prefab;
 }
 
+public struct ShootWeapon : IComponentData
+{
+    public bool shoot;
+    public float cooldown;
+    public float cooldownTimer;
+}
+
+public struct HasTrail : IComponentData
+{
+    public TrailID trailID;
+}
+
 public struct TrailSystemState : ISystemStateComponentData {
+    public TrailID trailID;
     public int trailIdx;
 }
 

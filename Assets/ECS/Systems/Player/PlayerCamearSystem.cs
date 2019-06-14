@@ -14,6 +14,9 @@ using Unity.Burst;
 [UpdateBefore(typeof(RenderMeshSystemV2))]
 public class PlayerCamearSystem : ComponentSystem
 {
+    //float3 camOffset = new float3(0, -3, 0);
+    float3 camOffset = float3.zero;
+
     public GameObject playerCamRoot;
 
     protected override void OnCreate()
@@ -25,16 +28,16 @@ public class PlayerCamearSystem : ComponentSystem
     {
         playerCamRoot = GameObject.FindGameObjectWithTag("PlayerCameraRoot");
 
-        Entities.WithAll<PlayerTag>().ForEach((ref Translation translation, ref Rotation rotation) => {
-            var forward = rotation.Value.forward();
-            var up = rotation.Value.up();
-            var left = rotation.Value.right();
-            //var camOffset = up + forward * -3 + left * 0;
-            var camOffset = float3.zero;
+        Entities.WithAll<PlayerTag>().ForEach((ref Translation translation, ref Rotation rotation, ref LocalToWorld localToWorld) => {
+            var x = localToWorld.Forward * camOffset.z;
+            var y = localToWorld.Up * camOffset.y;
+            var z = localToWorld.Right * camOffset.x;
+
+            var relativeCamOffset = x + y + z;
 
             var camTrans = playerCamRoot.transform;
             camTrans.rotation = rotation.Value;
-            camTrans.position = translation.Value +  camOffset;
+            camTrans.position = translation.Value + relativeCamOffset;
         });
     }
 }

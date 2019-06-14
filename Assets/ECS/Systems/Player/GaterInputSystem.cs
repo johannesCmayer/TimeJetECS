@@ -10,6 +10,20 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
+public class GatherShootInputSystem : ComponentSystem
+{
+    protected override void OnUpdate()
+    {
+        Entities.WithAll<PlayerTag>().ForEach((ref ShootWeapon shootWeapon) =>
+        {
+            if (Input.GetButton("Fire1"))
+            {
+                shootWeapon.shoot = true;
+            }
+        });
+    }
+}
+
 public class GatherTranslationInputSystem : ComponentSystem
 {
     const float moveSpeedCoef = 6;
@@ -28,12 +42,14 @@ public class GatherTranslationInputSystem : ComponentSystem
 
 public class SimpleGaterRotationInputSystem : ComponentSystem
 {
-    const float pitchSpeed = 100;
-    const float rollSpeed = 2000;
-    const float yawSpeed = 100;
+    const float pitchSpeed = 50;
+    const float rollSpeed = 1000;
+    const float yawSpeed = 50;
 
-    const float steerPosSensitivity = 20;
+    const float steerPosSensitivity = 18;
     const float steerPosMaxDistFromCenter = 20;
+
+    const float steerPosDeadzone = 1f;
 
     float2 steerPos = float2.zero;
 
@@ -61,7 +77,7 @@ public class SimpleGaterRotationInputSystem : ComponentSystem
             mouseY = Input.GetAxis("Mouse Y");
         }
         
-        steerPos += new float2(mouseX, mouseY) * Time.deltaTime * steerPosSensitivity;
+        steerPos += new float2(mouseX, mouseY) * Time.unscaledDeltaTime * steerPosSensitivity;
         if (math.length(steerPos) > steerPosMaxDistFromCenter)
             steerPos = math.normalize(steerPos) * steerPosMaxDistFromCenter;
 
@@ -70,7 +86,7 @@ public class SimpleGaterRotationInputSystem : ComponentSystem
         Entities.WithAll<PlayerTag>().ForEach((ref SteeringInput steerInput) =>
         {
             
-            if (Cursor.lockState != CursorLockMode.Locked)
+            if (Cursor.lockState != CursorLockMode.Locked || math.length(steerPos) < steerPosDeadzone)
             {
                 steerInput = new SteeringInput
                 {
@@ -81,11 +97,16 @@ public class SimpleGaterRotationInputSystem : ComponentSystem
                 return;
             }
 
+            var scaledSteerPos = math.pow(steerPos, 2);
+            scaledSteerPos = new float2(
+                math.abs(scaledSteerPos.x) - steerPosDeadzone * math.sign(scaledSteerPos.x),
+                math.abs(scaledSteerPos.y) - steerPosDeadzone * math.sign(scaledSteerPos.y));
+
             steerInput = new SteeringInput
             {
-                pitch = -steerPos.y * pitchSpeed * Time.deltaTime,
-                roll = Input.GetAxis("Roll") * rollSpeed * Time.deltaTime,
-                yaw = steerPos.x * yawSpeed * Time.deltaTime
+                pitch = -steerPos.y * pitchSpeed * Time.unscaledDeltaTime,
+                roll = Input.GetAxis("Roll") * rollSpeed * Time.unscaledDeltaTime,
+                yaw = steerPos.x * yawSpeed * Time.unscaledDeltaTime
             };
         });
     }
@@ -111,7 +132,7 @@ public class NoYawAutoRollGaterRotationInputSystem : ComponentSystem
         var mouseX = Input.GetAxis("Mouse X");
         var mouseY = Input.GetAxis("Mouse Y");
         
-        steerPos += new float2(mouseX, mouseY) * Time.deltaTime * steerPosSensitivity;
+        steerPos += new float2(mouseX, mouseY) * Time.unscaledDeltaTime * steerPosSensitivity;
         bool mouseNotMoved = mouseX == 0 && mouseY == 0;
         
         UIDataManager.instance.steerPos.transform.localPosition = new Vector3(steerPos.x, steerPos.y, 0) * 10;
@@ -166,11 +187,11 @@ public class NoYawAutoRollGaterRotationInputSystem : ComponentSystem
                 float val = 0;
                 if (steerPos.y > 0)                
                 {
-                    val = steerPos.y - (Time.deltaTime * pitchSpeed * 0.001f);
+                    val = steerPos.y - (Time.unscaledDeltaTime * pitchSpeed * 0.001f);
                 }
                 else if (steerPos.y < 0)
                 {
-                    val = steerPos.y + (Time.deltaTime * pitchSpeed * 0.001f);
+                    val = steerPos.y + (Time.unscaledDeltaTime * pitchSpeed * 0.001f);
                 }
 
                 steerPos = new float2(steerPos.x, val);
@@ -181,8 +202,8 @@ public class NoYawAutoRollGaterRotationInputSystem : ComponentSystem
 
             steerInput = new SteeringInput
             {
-                pitch = -pitch * Time.deltaTime,
-                roll = roll * 50 * Time.deltaTime,
+                pitch = -pitch * Time.unscaledDeltaTime,
+                roll = roll * 50 * Time.unscaledDeltaTime,
                 yaw = 0
             };
         });
@@ -198,7 +219,7 @@ public class NoYawAutoRollGaterRotationInputSystem : ComponentSystem
         var normSteerPos = math.normalize(steerPos);
         float cos = math.acos(normSteerPos.x);
         float sin = math.asin(normSteerPos.y);
-        var coef = Time.deltaTime * 1.3f * rollSpeed;
+        var coef = Time.unscaledDeltaTime * 1.3f * rollSpeed;
         var newSteerDir = math.normalize(new float2(math.cos(cos + dirX * coef), math.sin(sin + dirY * coef)));
 
         steerPos = newSteerDir * steerLen;

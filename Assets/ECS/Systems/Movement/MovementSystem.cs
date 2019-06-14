@@ -17,22 +17,25 @@ public class MovementSystem : JobComponentSystem
     {
         JobHandle moveJob = new MoveJob
         {
-            dt = Time.deltaTime
+            dt = Time.deltaTime,
+            udt = Time.unscaledDeltaTime
         }.Schedule(this, inputDeps);    
+
 
         return moveJob;
     }
 
     [ExcludeComponent(typeof(Velocity))]
     [BurstCompile]
-    struct MoveJob : IJobForEach<Translation, MoveSpeed, Rotation>
+    struct MoveJob : IJobForEachWithEntity<Translation, MoveSpeed, Rotation, LocalToWorld>
     {
         public float dt;
-        public void Execute(ref Translation translation, [ReadOnly] ref MoveSpeed moveSpeed, [ReadOnly] ref Rotation rotation)
+        public float udt;
+        public void Execute(Entity entity, int index, ref Translation translation, [ReadOnly] ref MoveSpeed moveSpeed, [ReadOnly] ref Rotation rotation, [ReadOnly] ref LocalToWorld localToWorld)
         {
-            var x = rotation.Value.right() * moveSpeed.Value.x;
-            var y = rotation.Value.up() * moveSpeed.Value.y;
-            var z = rotation.Value.forward() * moveSpeed.Value.z;
+            var x = localToWorld.Right * moveSpeed.Value.x;
+            var y = localToWorld.Up * moveSpeed.Value.y;
+            var z = localToWorld.Forward * moveSpeed.Value.z;
             translation.Value += (x + y + z) * dt;
         }
     }
@@ -45,21 +48,23 @@ public class VelocityMovementSystem : JobComponentSystem
     {
         JobHandle velocityMoveJob = new MoveVelocityJob
         {
-            dt = Time.deltaTime
+            dt = Time.deltaTime,
+            udt = Time.unscaledDeltaTime
         }.Schedule(this, inputDeps);
 
         return velocityMoveJob;
     }
 
     [BurstCompile]
-    struct MoveVelocityJob : IJobForEach<Translation, MoveSpeed, Rotation, Velocity>
+    struct MoveVelocityJob : IJobForEachWithEntity<Translation, Velocity, MoveSpeed, Rotation, LocalToWorld>
     {
         public float dt;
-        public void Execute(ref Translation translation, [ReadOnly] ref MoveSpeed moveSpeed, [ReadOnly] ref Rotation rotation, ref Velocity velocity)
+        public float udt;
+        public void Execute(Entity entity, int index, ref Translation translation, ref Velocity velocity, [ReadOnly] ref MoveSpeed moveSpeed, [ReadOnly] ref Rotation rotation, [ReadOnly] ref LocalToWorld localToWorld)
         {
-            var x = rotation.Value.right() * moveSpeed.Value.x;
-            var y = rotation.Value.up() * moveSpeed.Value.y;
-            var z = rotation.Value.forward() * moveSpeed.Value.z;
+            var x = localToWorld.Right * moveSpeed.Value.x;
+            var y = localToWorld.Up * moveSpeed.Value.y;
+            var z = localToWorld.Forward * moveSpeed.Value.z;
 
             velocity.Value += (x + y + z) * dt;
             translation.Value += velocity.Value * dt;
@@ -67,3 +72,47 @@ public class VelocityMovementSystem : JobComponentSystem
     }
 }
 
+[UpdateInGroup(typeof(CTransformSystemGroup))]
+public class VelocityMovementChunkSystem : JobComponentSystem
+{
+    EntityQuery querry;
+
+    protected override void OnCreate()
+    {
+        querry = GetEntityQuery(typeof(Translation), typeof(Velocity), ComponentType.ReadOnly<MoveSpeed>(), ComponentType.ReadOnly<Rotation>(), ComponentType.ReadOnly<LocalToWorld>());
+    }
+
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    {
+        JobHandle velocityMoveJob = new MoveVelocityJob
+        {
+            dt = Time.deltaTime,
+            udt = Time.unscaledDeltaTime
+        }.Schedule(querry, inputDeps);
+
+        return velocityMoveJob;
+    }
+
+    [BurstCompile]
+    struct MoveVelocityJob : IJobChunk
+    {
+        public float dt;
+        public float udt;
+
+
+        public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
+        {
+            var deltaTime = dt;
+            if (chunk.Has<UseUnscaledDeltatime>())
+                deltaTime = udt;
+            var tranlation.Value = chunk.GetNativeArray();
+
+            var x = localToWorld.Right * moveSpeed.Value.x;
+            var y = localToWorld.Up * moveSpeed.Value.y;
+            var z = localToWorld.Forward * moveSpeed.Value.z;
+
+            velocity.Value += (x + y + z) * dt;
+            translation.Value += velocity.Value * dt;
+        }
+    }
+}

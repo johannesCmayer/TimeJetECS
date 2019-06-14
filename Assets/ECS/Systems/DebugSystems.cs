@@ -15,9 +15,9 @@ public class DebugDrawLocalDirVecs : ComponentSystem
 {
     protected override void OnUpdate()
     {
-        Entities.ForEach((ref Rotation r, ref Translation t) =>
+        Entities.ForEach((ref Rotation r, ref Translation t, ref LocalToWorld localToWorld) =>
         {
-            var dir = new float3[] { r.Value.forward(), r.Value.up(), r.Value.right() };
+            var dir = new float3[] { localToWorld.Forward, localToWorld.Up, localToWorld.Right };
             var colors = new Color[] { Color.blue, Color.green, Color.red };
 
             for (int i = 0; i < dir.Length; i++)

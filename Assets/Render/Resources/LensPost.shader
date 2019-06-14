@@ -94,6 +94,30 @@
 		return latlon_to_ray(float2(lat, lon));
 	}
 
+	float3 psudo_inv(float2 uv)
+	{
+		float r = length(uv);
+		float n = sqrt(1 - 0.06*uv.x*uv.x - 0.25*uv.y*uv.y);
+
+		/*if (r > 2.5)
+		{
+		return NOCOLVEC;
+		}*/
+
+		float a = 1;
+
+		float lat = asin(uv.y*n);
+		float lon = 2 * atan2(n*uv.x, (2 * (2 * n*n - 1)));
+		return latlon_to_ray(float2(lat, lon));
+
+		float3 ret = float3(
+			uv.x * sin(n) / n,
+			uv.y * sin(n) / n,
+			n);
+
+		return normalize(ret);
+	}
+
 	float3 panini_inv(float2 uv)
 	{
 		float d = 1;
@@ -268,21 +292,6 @@
 		return float3(x / r * s, y / r * s, cos(theta));
 	}
 
-	float3 psudo_inv(float2 uv)
-	{
-		float r = length(uv);
-
-		if (r > 2.5)
-		{
-			return NOCOLVEC;
-		}
-
-		return float3(
-			sin(uv.x), 
-			sin(uv.y),
-			cos(r));
-	}
-
 	float3 prism_inv(float2 uv)
 	{
 		float coef = 8;
@@ -401,8 +410,8 @@
 
 		//float3 dirVec = fisheye_2_inv(centeredUV);
 		//float3 dirVec = hammer_inv(centeredUV);
-		//float3 dirVec = winkelTripel_inv(centeredUV);
-		float3 dirVec = psudo_inv(centeredUV);
+		float3 dirVec = winkelTripel_inv(centeredUV);
+		//float3 dirVec = psudo_inv(centeredUV);
 		float4 col = dirVecToCol(dirVec);
 		return col;
 	}

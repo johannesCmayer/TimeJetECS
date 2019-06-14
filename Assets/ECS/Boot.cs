@@ -22,12 +22,16 @@ public class Boot : MonoBehaviour
         var player = entityManager.Instantiate(UnitEnityDefinitions.playerPrefab);
         entityManager.SetComponentData(player, new Translation { Value = new float3(0, 0, -30) });
 
-        var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 100, gd.EnemyPlaneMesh, gd.enemyPlaneMaterial);
+        var enemyPlanes = UnitEnityDefinitions.SetupPlanes(UnitEnityDefinitions.enemyPlaneArechetype, 2, gd.EnemyPlaneMesh, gd.enemyPlaneMaterial);
 
-        //for (int i = 0; i < enemyPlanes.Length; i++)
-        //{
-        //    var spawnPos = new float3(R.Range(-100, 100), R.Range(-100, 100), R.Range(-100, 100)) + new float3(0, 0, 300);
-        //    UnitEnityDefinitions.SetupMissile(spawnPos, quaternion.identity, new Velocity { Value = float3.zero }, enemyPlanes[i]);
-        //}
+        for (int i = 0; i < enemyPlanes.Length; i++)
+        {
+            entityManager.SetComponentData(enemyPlanes[i], new TargetSelection { target = player });
+            entityManager.SetComponentData(enemyPlanes[i], new RotationSpeed {Value = 3});
+            entityManager.SetComponentData(enemyPlanes[i], new MoveSpeed { Value = new float3(0,0,1) });
+
+            //var spawnPos = new float3(0, 0, 40 + i * 2);
+            //UnitEnityDefinitions.SetupMissile(spawnPos, quaternion.Euler(0, 180, 0), new Velocity { Value = float3.zero }, enemyPlanes[i]);
+        }
     }
 }

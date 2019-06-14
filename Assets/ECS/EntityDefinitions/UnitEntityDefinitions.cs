@@ -18,6 +18,8 @@ public class UnitEnityDefinitions
     public static EntityArchetype friendlyPlaneArechetype;
     public static EntityArchetype enemyPlaneArechetype;
     public static EntityArchetype missileArechetype;
+    public static EntityArchetype shotArechetype;
+
     static bool isSetup;
     static EntityManager entityManager;
 
@@ -33,8 +35,10 @@ public class UnitEnityDefinitions
         playerPlaneArechetype = entityManager.CreateArchetype(
             typeof(PlayerTag),
             typeof(Prefab),
+            typeof(ShootWeapon),
             typeof(Alive),
             typeof(Respawn),
+            typeof(UseUnscaledDeltatime),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -66,8 +70,10 @@ public class UnitEnityDefinitions
             typeof(FriendlyAITag),
             typeof(Respawn),
             typeof(Alive),
+            typeof(ShootWeapon),
 
             typeof(MoveSpeed),
+            typeof(RotationSpeed),
             typeof(Velocity),
             typeof(TargetSelection),
             typeof(TurnTowardsTarget),
@@ -85,8 +91,10 @@ public class UnitEnityDefinitions
             typeof(EnemyAITag),
             typeof(Respawn),
             typeof(Alive),
+            typeof(ShootWeapon),
 
             typeof(MoveSpeed),
+            typeof(RotationSpeed),
             typeof(Velocity),
             typeof(TargetSelection),
             typeof(TurnTowardsTarget),
@@ -102,7 +110,7 @@ public class UnitEnityDefinitions
 
         missileArechetype = entityManager.CreateArchetype(
             typeof(MissileTag),
-            typeof(HasTrailTag),
+            typeof(HasTrail),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -118,6 +126,24 @@ public class UnitEnityDefinitions
             typeof(RenderMesh),
 
             typeof(SphereCollider)
+        );
+
+        shotArechetype = entityManager.CreateArchetype(
+            typeof(ProjectileTag),
+            typeof(HasTrail),
+
+            typeof(MoveSpeed),
+            typeof(Velocity),
+
+            typeof(Translation),
+            typeof(Rotation),
+            typeof(Scale),
+            typeof(LocalToWorld),
+
+            typeof(RenderMesh),
+
+            typeof(SphereCollider),
+            typeof(DestroyAfterTime)
         );
     }
 
@@ -136,6 +162,7 @@ public class UnitEnityDefinitions
             entityManager.SetComponentData(plane, new SphereCollider { size = 1f });
             entityManager.SetComponentData(plane, new MoveSpeed { Value = new float3(0, 0, 0f) });
             //entityManager.SetComponentData(plane, new Velocity { Value = new float3(0, 0, 1f) });
+            entityManager.SetComponentData(plane, new ShootWeapon { cooldown = 0.05f });
             entityManager.SetSharedComponentData(plane, new RenderMesh
             {
                 mesh = mesh,
@@ -147,11 +174,11 @@ public class UnitEnityDefinitions
 
     public static void SetupMissile(float3 pos, quaternion rotation, Velocity v, Entity target)
     {
-        var missile = entityManager.CreateEntity(UnitEnityDefinitions.missileArechetype);
+        var missile = entityManager.CreateEntity(missileArechetype);
         entityManager.SetComponentData(missile, new Translation { Value = pos });
         entityManager.SetComponentData(missile, new Rotation { Value = rotation });
         entityManager.SetComponentData(missile, new SphereCollider { size = 1f });
-        entityManager.SetComponentData(missile, new MoveSpeed { Value = new float3(0, 0, 1f) });
+        entityManager.SetComponentData(missile, new MoveSpeed { Value = new float3(0, 0, 10f) });
         entityManager.SetComponentData(missile, new Velocity { Value = v.Value });
         entityManager.SetComponentData(missile, new RotationSpeed { Value = 4 });
         entityManager.SetComponentData(missile, new Scale { Value = 1f });
@@ -161,6 +188,25 @@ public class UnitEnityDefinitions
             material = GlobalData.instance.missileMaterial
         });
         entityManager.SetComponentData(missile, new Scale { Value = 0.3f });
-        entityManager.SetComponentData(missile, new TargetSelection { target = target });        
+        entityManager.SetComponentData(missile, new TargetSelection { target = target });
+        entityManager.SetComponentData(missile, new HasTrail { trailID = TrailID.Missile });
+    }
+
+    public static void SetupShot(EntityCommandBuffer buffer, float3 pos, quaternion rotation, LocalToWorld localToWorld,  Velocity v)
+    {        
+        var shot = buffer.CreateEntity(shotArechetype);
+        buffer.SetComponent(shot, new Translation { Value = pos });
+        buffer.SetComponent(shot, new Rotation { Value = rotation });
+        buffer.SetComponent(shot, new SphereCollider { size = 0.2f });
+        buffer.SetComponent(shot, new MoveSpeed { Value = new float3(0, 0, 0) });
+        buffer.SetComponent(shot, new Velocity { Value = v.Value + localToWorld.Forward * 150 });
+        //buffer.SetSharedComponent(shot, new RenderMesh
+        //{
+        //    mesh = GlobalData.instance.shotMesh,
+        //    material = GlobalData.instance.shotMaterial
+        //});
+        buffer.SetComponent(shot, new Scale { Value = 1f });
+        buffer.SetComponent(shot, new DestroyAfterTime { timeToDestruction = 10 });
+        buffer.SetComponent(shot, new HasTrail { trailID = TrailID.Shot });
     }
 }

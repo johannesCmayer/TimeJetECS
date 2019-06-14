@@ -53,10 +53,18 @@ MonoBehaviour:
   missileMesh: {fileID: -3055721002252356758, guid: 32b9fc3db0d5ca64fb6a30acc1c626dd,
     type: 3}
   missileMaterial: {fileID: 2100000, guid: 90891c5433f73374badb12b611f2bfff, type: 2}
+  shotMesh: {fileID: -7523663498517293217, guid: 32b9fc3db0d5ca64fb6a30acc1c626dd,
+    type: 3}
+  shotMaterial: {fileID: 2100000, guid: e6693f3521be62944a35702bc66b6c7d, type: 2}
   explosionMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   explosionMaterial: {fileID: 2100000, guid: cecf8e3eb839c0a42926dea5244e022b, type: 2}
   missileTrailMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   missileTrailMaterial: {fileID: 2100000, guid: cecf8e3eb839c0a42926dea5244e022b,
     type: 2}
-  TrailRenderer: {fileID: 6413203767959416617, guid: 9a18dda371abbcc45a703b1b78e33695,
+  missileTrailPrefab: {fileID: 6413203767959416617, guid: 9a18dda371abbcc45a703b1b78e33695,
     type: 3}
+  shotTrailPrefab: {fileID: 6413203767959416617, guid: 2cd496d2c6ebf904f9e323232d8916ad,
+    type: 3}
+  SphereColliderDisplayMesh: {fileID: 10207, guid: 0000000000000000e000000000000000,
+    type: 0}
+  SphereColliderDisplayMaterial: {fileID: 0}
