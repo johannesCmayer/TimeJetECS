@@ -1103,7 +1103,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 3c37ad31c6280514892e2ba1d309a4e3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1671,7 +1671,7 @@ PrefabInstance:
     - target: {fileID: 830931717773926905, guid: f2e9f81e5b3d314458f8f1af28aa524e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -13.9
       objectReference: {fileID: 0}
     - target: {fileID: 830931717773926905, guid: f2e9f81e5b3d314458f8f1af28aa524e,
         type: 3}
@@ -1722,36 +1722,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 830931718524614996, guid: f2e9f81e5b3d314458f8f1af28aa524e,
-        type: 3}
-      propertyPath: far clip plane
-      value: 10000
-      objectReference: {fileID: 0}
-    - target: {fileID: 830931717612001764, guid: f2e9f81e5b3d314458f8f1af28aa524e,
-        type: 3}
-      propertyPath: far clip plane
-      value: 10000
-      objectReference: {fileID: 0}
-    - target: {fileID: 830931717752554426, guid: f2e9f81e5b3d314458f8f1af28aa524e,
-        type: 3}
-      propertyPath: far clip plane
-      value: 10000
-      objectReference: {fileID: 0}
-    - target: {fileID: 830931718353288612, guid: f2e9f81e5b3d314458f8f1af28aa524e,
-        type: 3}
-      propertyPath: far clip plane
-      value: 10000
-      objectReference: {fileID: 0}
-    - target: {fileID: 830931718748572125, guid: f2e9f81e5b3d314458f8f1af28aa524e,
-        type: 3}
-      propertyPath: far clip plane
-      value: 10000
-      objectReference: {fileID: 0}
-    - target: {fileID: 830931718273618431, guid: f2e9f81e5b3d314458f8f1af28aa524e,
-        type: 3}
-      propertyPath: far clip plane
-      value: 10000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f2e9f81e5b3d314458f8f1af28aa524e, type: 3}

@@ -39,6 +39,7 @@ public class UnitEnityDefinitions
             typeof(Alive),
             typeof(Respawn),
             typeof(UseUnscaledDeltatime),
+            typeof(ECSLayer),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -71,6 +72,7 @@ public class UnitEnityDefinitions
             typeof(Respawn),
             typeof(Alive),
             typeof(ShootWeapon),
+            typeof(ECSLayer),
 
             typeof(MoveSpeed),
             typeof(RotationSpeed),
@@ -92,6 +94,7 @@ public class UnitEnityDefinitions
             typeof(Respawn),
             typeof(Alive),
             typeof(ShootWeapon),
+            typeof(ECSLayer),
 
             typeof(MoveSpeed),
             typeof(RotationSpeed),
@@ -111,6 +114,7 @@ public class UnitEnityDefinitions
         missileArechetype = entityManager.CreateArchetype(
             typeof(MissileTag),
             typeof(HasTrail),
+            typeof(ECSLayer),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -131,6 +135,7 @@ public class UnitEnityDefinitions
         shotArechetype = entityManager.CreateArchetype(
             typeof(ProjectileTag),
             typeof(HasTrail),
+            typeof(ECSLayer),
 
             typeof(MoveSpeed),
             typeof(Velocity),
@@ -161,8 +166,35 @@ public class UnitEnityDefinitions
             entityManager.SetComponentData(plane, new Scale { Value = 1f });
             entityManager.SetComponentData(plane, new SphereCollider { size = 1f });
             entityManager.SetComponentData(plane, new MoveSpeed { Value = new float3(0, 0, 0f) });
+            entityManager.SetComponentData(plane, new ECSLayer { layerID = ECSLayerID.Ship });
             //entityManager.SetComponentData(plane, new Velocity { Value = new float3(0, 0, 1f) });
             entityManager.SetComponentData(plane, new ShootWeapon { cooldown = 0.05f });
+            entityManager.SetSharedComponentData(plane, new RenderMesh
+            {
+                mesh = mesh,
+                material = material
+            });
+        }
+        return planes;
+    }
+
+    public static NativeArray<Entity> SetupAIPlanes(EntityArchetype a, int amount, Mesh mesh, Material material)
+    {
+        NativeArray<Entity> planes = new NativeArray<Entity>(amount, Allocator.Temp);
+        entityManager.CreateEntity(a, planes);
+        for (int i = 0; i < amount; i++)
+        {
+            var plane = planes[i];
+            var r = 20;
+            var rpos = new float3(R.Range(-r, r), R.Range(-r, r), R.Range(-r, r));
+            entityManager.SetComponentData(plane, new Translation { Value = rpos });
+            entityManager.SetComponentData(plane, new Rotation { Value = quaternion.identity });
+            entityManager.SetComponentData(plane, new Scale { Value = 2f });
+            entityManager.SetComponentData(plane, new SphereCollider { size = 2f });
+            entityManager.SetComponentData(plane, new MoveSpeed { Value = new float3(0, 0, 0f) });
+            entityManager.SetComponentData(plane, new ECSLayer { layerID = ECSLayerID.Ship });
+            //entityManager.SetComponentData(plane, new Velocity { Value = new float3(0, 0, 1f) });
+            entityManager.SetComponentData(plane, new ShootWeapon { cooldown = 1f });
             entityManager.SetSharedComponentData(plane, new RenderMesh
             {
                 mesh = mesh,
@@ -182,6 +214,7 @@ public class UnitEnityDefinitions
         entityManager.SetComponentData(missile, new Velocity { Value = v.Value });
         entityManager.SetComponentData(missile, new RotationSpeed { Value = 4 });
         entityManager.SetComponentData(missile, new Scale { Value = 1f });
+        entityManager.SetComponentData(missile, new ECSLayer { layerID = ECSLayerID.Missiles });
         entityManager.SetSharedComponentData(missile, new RenderMesh
         {
             mesh = GlobalData.instance.missileMesh,
@@ -200,6 +233,7 @@ public class UnitEnityDefinitions
         buffer.SetComponent(shot, new SphereCollider { size = 0.2f });
         buffer.SetComponent(shot, new MoveSpeed { Value = new float3(0, 0, 0) });
         buffer.SetComponent(shot, new Velocity { Value = v.Value + localToWorld.Forward * 150 });
+        buffer.SetComponent(shot, new ECSLayer { layerID = ECSLayerID.Projectiles });
         //buffer.SetSharedComponent(shot, new RenderMesh
         //{
         //    mesh = GlobalData.instance.shotMesh,

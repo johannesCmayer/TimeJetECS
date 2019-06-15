@@ -67,5 +67,5 @@ public class GlobalData : MonoBehaviour
     private void Awake()
     {
         instance = this;
-    }
+    }    
 }

@@ -21,6 +21,12 @@ public struct UseUnscaledDeltatime : IComponentData { }
 
 public struct ExplosionTag : IComponentData { }
 public struct Alive : IComponentData { }
+
+public struct ECSLayer : IComponentData
+{
+    public ECSLayerID layerID;
+}
+
 public struct Respawn : IComponentData {
     public float3 pos;
     public Entity prefab;

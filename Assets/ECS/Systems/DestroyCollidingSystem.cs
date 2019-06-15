@@ -23,18 +23,21 @@ public class DestroyCollidingSystem : JobComponentSystem
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         var q = GetEntityQuery(
-            ComponentType.ReadOnly<SphereCollider>(), 
-            ComponentType.ReadOnly<Translation>()
+            ComponentType.ReadOnly<SphereCollider>(),
+            ComponentType.ReadOnly<Translation>(),
+            ComponentType.ReadOnly<ECSLayer>()
         );
         NativeArray<Entity> entitiesWithColliders = q.ToEntityArray(Allocator.TempJob);
         NativeArray<Translation> entityColliderTranslations = q.ToComponentDataArray<Translation>(Allocator.TempJob);
         NativeArray<SphereCollider> entityColliders = q.ToComponentDataArray<SphereCollider>(Allocator.TempJob);
+        NativeArray<ECSLayer> entityLayers = q.ToComponentDataArray<ECSLayer>(Allocator.TempJob);
 
         var job = new DestroyJob
         {
             entitiesWithColliders = entitiesWithColliders,
             entityColliderTranslations = entityColliderTranslations,
             entityColliders = entityColliders,
+            entityLayers = entityLayers,
             commandBuffer = simulationEntityCommandBufferSystem.CreateCommandBuffer().ToConcurrent()
     };
         inputDeps = job.Schedule(this, inputDeps);
@@ -45,19 +48,27 @@ public class DestroyCollidingSystem : JobComponentSystem
     }
 
     //[BurstCompile]
-    struct DestroyJob : IJobForEachWithEntity<SphereCollider, Translation>
+    struct DestroyJob : IJobForEachWithEntity<SphereCollider, Translation, ECSLayer>
     {
         public EntityCommandBuffer.Concurrent commandBuffer;
         [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<Entity> entitiesWithColliders;
         [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<Translation> entityColliderTranslations;
         [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<SphereCollider> entityColliders;
-        
+        [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<ECSLayer> entityLayers;
 
-        public void Execute(Entity entity, int index, [ReadOnly] ref SphereCollider collider, [ReadOnly] ref Translation translation)
+        public void Execute(Entity entity, int index, [ReadOnly] ref SphereCollider collider, [ReadOnly] ref Translation translation, [ReadOnly] ref ECSLayer eCSLayer)
         {
             for (int i = 0; i < entityColliderTranslations.Length; i++)
             {
-                if (entity == entitiesWithColliders[i])
+                bool layerCollisionSet = false;
+                var collidingLayers = eCSLayer.layerID.GetCollidingLayers();
+                for (int j = 0; j < collidingLayers.Length; j++)
+                {
+                    if (collidingLayers[j] == entityLayers[i].layerID)
+                        layerCollisionSet = true;
+                }
+
+                if (entity == entitiesWithColliders[i] || !layerCollisionSet)
                     continue;
 
                 if (math.distance(translation.Value, entityColliderTranslations[i].Value) < collider.size + entityColliders[i].size)
