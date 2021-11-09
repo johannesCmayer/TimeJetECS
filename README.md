@@ -3,4 +3,4 @@ I explored how to use the Unity ECS. I ended up with a very basic prototype wher
 
 I have also implemented the [Winkel tripel projection](https://www.wikiwand.com/en/Winkel_tripel_projection) in a shader, to create a 360 degree camera by studying the source code of [Blinky](https://github.com/shaunlebron/blinky).
 
-All of the art assets are from the assetstore.
+All of the art assets are from the Unity assetstore.
