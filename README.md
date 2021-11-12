@@ -5,5 +5,7 @@ I have also implemented the [Winkel tripel projection](https://www.wikiwand.com/
 
 All of the art assets are from the Unity asset store.
 
+[Click here to see a longer video.](https://youtu.be/aHQeb8UERN8)
+
 <img src="TimeJetECS-A.gif" alt="gif" width="1280"/>
 <img src="TimeJetECS-B.gif" alt="gif" width="1280"/>
